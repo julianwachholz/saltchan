@@ -9,8 +9,8 @@
 <h1>pgpchan</h1>
 
 /
-{% for board, info in boards.items() %}
-    <a href="{{ url_for('board', board=board) }}" title="{{ info.title }}">{{ board }}</a> /
+{% for board in boards.values() %}
+    <a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a> /
 {% endfor %}
 
 </body>

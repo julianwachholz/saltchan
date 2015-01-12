@@ -63,40 +63,40 @@ def index():
     }
 
 
-@app.route('/<board>/', methods=['GET', 'POST'])
-@app.route('/<board>/<int:page>/', methods=['GET', 'POST'])
+@app.route('/<board_id>/', methods=['GET', 'POST'])
+@app.route('/<board_id>/<int:page>/', methods=['GET', 'POST'])
 @templated('board.html')
-def board(board, page=1):
-    if board not in config.BOARDS.keys() or page > 10:
+def board(board_id, page=1):
+    if board_id not in config.BOARDS.keys() or page > 10:
         return '404', 404
 
     if request.method == 'POST':
         text = _validate_form(request)
-        thread_id = bbs.new_thread(r, board, text)
-        return redirect(url_for('thread', board=board, thread_id=thread_id))
+        thread_id = bbs.new_thread(r, request, board_id, text)
+        return redirect(url_for('thread', board_id=board_id, thread_id=thread_id))
 
-    threads = bbs.get_threads(r, board, page - 1)
+    threads = bbs.get_threads(r, board_id, page - 1)
     return {
         'page': page,
         'threads': threads,
-        'board': config.BOARDS[board],
+        'board': config.BOARDS[board_id],
     }
 
 
-@app.route('/<board>/thread/<int:thread_id>', methods=['GET', 'POST'])
+@app.route('/<board_id>/thread/<int:thread_id>', methods=['GET', 'POST'])
 @templated('thread.html')
-def thread(board, thread_id):
+def thread(board_id, thread_id):
     if request.method == 'POST':
         text = _validate_form(request)
-        reply_id = bbs.new_reply(r, board, thread_id, request.form.get('text'))
-        thread_url = url_for('thread', board=board, thread_id=thread_id)
+        reply_id = bbs.new_reply(r, request, board_id, thread_id, text)
+        thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
         return redirect('%s#id%d' % (thread_url, reply_id))
 
-    posts = bbs.get_posts(r, board, thread_id)
+    posts = bbs.get_posts(r, board_id, thread_id)
     return {
         'thread_id': thread_id,
         'posts': posts,
-        'board': config.BOARDS[board],
+        'board': config.BOARDS[board_id],
     }
 
 

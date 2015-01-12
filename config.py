@@ -1,7 +1,8 @@
 import os
+from collections import OrderedDict
 
 
-BOARDS = {
+BOARDS = OrderedDict({
     'b': {
         'id': 'b',
         'title': 'Random',
@@ -10,7 +11,7 @@ BOARDS = {
         'id': 'r9k',
         'title': 'Robot 9000',
     },
-}
+})
 
 THREADS_PER_PAGE = 10
 
