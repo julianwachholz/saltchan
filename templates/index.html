@@ -1,16 +1,7 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>pgpchan</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<h1>pgpchan</h1>
+{% block content %}
 
-/
-{% for board in boards.values() %}
-    <a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a> /
-{% endfor %}
+  <p>Welcome to pgpchan.</p>
 
-</body>
+{% endblock %}

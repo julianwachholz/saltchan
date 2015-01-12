@@ -1,19 +1,7 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>/{{ board.id }}/ - {{ board.title }} No. {{ thread_id }}</title>
-  {% if RECAPTCHA %}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{% endif %}
-  <style>
-    abbr { border-bottom: 1px dotted; }
-  </style>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block title %}/{{ board.id }}/ - {{ board.title }} No. {{ thread_id }}{% endblock %}
 
-<h1>
-  <a href="{{ url_for('board', board_id=board.id) }}" accesskey="b">/{{ board.id }}/</a>
-   - {{ board.title }} No. {{ thread_id }}
-</h1>
+{% block content %}
 
 <h3>Replies</h3>
 
@@ -32,5 +20,5 @@
   {% if RECAPTCHA %}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{% endif %}
   <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
 </form>
-</body>
-</html>
+
+{% endblock %}

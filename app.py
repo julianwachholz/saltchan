@@ -14,8 +14,9 @@ _RE_PARA = re.compile(r'(?:\r\n|\n){2,}')
 
 
 @app.context_processor
-def inject_user():
+def app_context():
     return {
+        'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
         'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
     }
@@ -58,9 +59,7 @@ def _validate_form(request):
 @app.route('/')
 @templated('index.html')
 def index():
-    return {
-        'boards': config.BOARDS,
-    }
+    pass
 
 
 @app.route('/<board_id>/', methods=['GET', 'POST'])
