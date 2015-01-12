@@ -23,6 +23,14 @@ def app_context():
     }
 
 
+@app.errorhandler(400)
+@templated('error.html')
+def custom400(error):
+    return {
+        'error': error.description
+    }
+
+
 @app.template_filter()
 @evalcontextfilter
 def nl2br(eval_ctx, value):
@@ -40,14 +48,17 @@ def _validate_form(request, with_subject=False):
     """
     data = request.form.get('data', '')
     try:
-        json.loads(data)
+        obj = json.loads(data)
     except ValueError:
-        abort(400)
+        abort(400, 'Invalid JSON received.')
+
+    if not obj['message'].strip():
+        abort(400, 'Empty message.')
 
     if with_subject:
         subject = request.form.get('subject', '').strip()
         if not subject:
-            abort(400)
+            abort(400, 'Missing subject.')
 
     if config.RECAPTCHA:
         params = {
@@ -59,7 +70,7 @@ def _validate_form(request, with_subject=False):
         url += '&'.join('{}={}'.format(key, val) for key, val in params.items())
         r = requests.get(url)
         if not r.json()['success']:
-            abort(400)
+            abort(400, 'ReCAPTCHA challenge failed.')
 
     if with_subject:
         return subject, data
@@ -77,7 +88,7 @@ def index():
 @templated('board.html')
 def board(board_id, page=1):
     if board_id not in config.BOARDS.keys() or page > 10:
-        return '404', 404
+        abort(404)
 
     if request.method == 'POST':
         subject, data = _validate_form(request, True)
