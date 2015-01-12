@@ -5,20 +5,31 @@
 <h3>Replies</h3>
 
 {% for post in posts -%}
-<article id="id{{ post.id }}">
-  <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
-  No. <a href="#id{{ post.id }}">{{ post.id }}</a><br>
+<article id="id{{ post.id }}" class="js-verify"
+  data-signature="{{ post.data.signature }}"
+  data-pubsign="{{ post.data.pubsign }}"
+  data-pubkey="{{ post.data.pubkey }}">
+  <div class="info">
+    <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
+    <span class="badge">{{ post.data.pubsign[0:10] }}</span>
+    <span class="postid">
+      No. <a href="#id{{ post.id }}">{{ post.id }}</a>
+    </span>
+  </div>
   {% if loop.first %}
     <strong>{{ thread_subject }}</strong>
   {% endif %}
-  {{ post.text|nl2br }}
+  <p class="reply-text">{{ post.data.message }}</p>
 </article>
 <hr>
 {% endfor %}
-<form method="post">
+<form method="post" data-mode="reply">
   <h4><abbr>R</abbr>eply:</h4>
-  <textarea rows="6" cols="40" name="text" accesskey="r" tabindex="1" required></textarea><br>
+  <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="1" required></textarea><br>
   {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
+  <input type="hidden" name="data" id="form-data">
 </form>
+
+<meta id="meta-thread" name="thread" value="{{ thread_id }}">
 {% endblock %}

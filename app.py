@@ -1,4 +1,5 @@
 import re
+import json
 import requests
 from flask import Flask, abort, request, redirect, render_template, url_for
 from jinja2 import evalcontextfilter, Markup, escape
@@ -37,8 +38,10 @@ def _validate_form(request, with_subject=False):
     Check if we actually got a text input and verify the captcha.
 
     """
-    text = request.form.get('text', '').strip()
-    if not text:
+    data = request.form.get('data', '')
+    try:
+        json.loads(data)
+    except ValueError:
         abort(400)
 
     if with_subject:
@@ -59,8 +62,8 @@ def _validate_form(request, with_subject=False):
             abort(400)
 
     if with_subject:
-        return subject, text
-    return text
+        return subject, data
+    return data
 
 
 @app.route('/')
@@ -77,8 +80,8 @@ def board(board_id, page=1):
         return '404', 404
 
     if request.method == 'POST':
-        subject, text = _validate_form(request, True)
-        thread_id = bbs.new_thread(r, request, board_id, subject, text)
+        subject, data = _validate_form(request, True)
+        thread_id = bbs.new_thread(r, request, board_id, subject, data)
         return redirect(url_for('thread', board_id=board_id, thread_id=thread_id))
 
     threads = bbs.get_threads(r, board_id, page - 1)
@@ -93,12 +96,15 @@ def board(board_id, page=1):
 @templated('thread.html')
 def thread(board_id, thread_id):
     if request.method == 'POST':
-        text = _validate_form(request)
-        reply_id = bbs.new_reply(r, request, board_id, thread_id, text)
+        data = _validate_form(request)
+        reply_id = bbs.new_reply(r, request, board_id, thread_id, data)
         thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
         return redirect('%s#id%d' % (thread_url, reply_id))
 
     posts = bbs.get_posts(r, board_id, thread_id)
+    if not posts:
+        abort(404)
+
     return {
         'thread_id': thread_id,
         'thread_subject': bbs.get_subject(r, board_id, thread_id),
