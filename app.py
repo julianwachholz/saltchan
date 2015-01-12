@@ -32,7 +32,7 @@ def nl2br(eval_ctx, value):
     return result
 
 
-def _validate_form(request):
+def _validate_form(request, with_subject=False):
     """
     Check if we actually got a text input and verify the captcha.
 
@@ -40,6 +40,11 @@ def _validate_form(request):
     text = request.form.get('text', '').strip()
     if not text:
         abort(400)
+
+    if with_subject:
+        subject = request.form.get('subject', '').strip()
+        if not subject:
+            abort(400)
 
     if config.RECAPTCHA:
         params = {
@@ -53,6 +58,8 @@ def _validate_form(request):
         if not r.json()['success']:
             abort(400)
 
+    if with_subject:
+        return subject, text
     return text
 
 
@@ -70,8 +77,8 @@ def board(board_id, page=1):
         return '404', 404
 
     if request.method == 'POST':
-        text = _validate_form(request)
-        thread_id = bbs.new_thread(r, request, board_id, text)
+        subject, text = _validate_form(request, True)
+        thread_id = bbs.new_thread(r, request, board_id, subject, text)
         return redirect(url_for('thread', board_id=board_id, thread_id=thread_id))
 
     threads = bbs.get_threads(r, board_id, page - 1)
@@ -94,6 +101,7 @@ def thread(board_id, thread_id):
     posts = bbs.get_posts(r, board_id, thread_id)
     return {
         'thread_id': thread_id,
+        'thread_subject': bbs.get_subject(r, board_id, thread_id),
         'posts': posts,
         'board': config.BOARDS[board_id],
     }

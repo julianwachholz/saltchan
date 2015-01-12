@@ -11,7 +11,7 @@ KEY_REPLIES = 'thread_%(board)s_%(thread)d'
 KEY_REPLY_COUNT = 'replies_%(board)s_%(thread)d'
 
 
-def new_thread(r, request, board_id, text):
+def new_thread(r, request, board_id, subject, text):
     thread = r.incr(KEY_COUNT % {'board': board_id})
     now = datetime.utcnow()
     pipe = r.pipeline()
@@ -19,6 +19,7 @@ def new_thread(r, request, board_id, text):
         'id': thread,
         'date': str(now),
         'text': text,
+        'subject': subject,
     })
     pipe.hmset(KEY_BUMP % {'board': board_id, 'thread': thread}, {
         'time': now.strftime('%s'),
@@ -35,13 +36,16 @@ get = lambda board, field: 'post_%s_*->%s' % (board, field)
 
 
 def _cast_post(post):
-    replies = int(post[3]) if len(post) == 4 else None
-    return {
+    postobj = {
         'id': int(post[0]),
         'date': dateutil.parser.parse(post[1].decode('utf-8')),
         'text': post[2].decode('utf-8'),
-        'reply_count': replies,
     }
+    if len(post) == 4:
+        postobj.update({
+            'reply_count': int(post[3]),
+        })
+    return postobj
 
 
 def get_threads(r, board, page=0):
@@ -50,7 +54,7 @@ def get_threads(r, board, page=0):
         num=config.THREADS_PER_PAGE,
         start=config.THREADS_PER_PAGE * page,
         by=KEY_BUMP_SORT % {'board': board},
-        get=[get(board, 'id'), get(board, 'date'), get(board, 'text'), 'replies_%s_*' % board],
+        get=[get(board, 'id'), get(board, 'date'), get(board, 'subject'), 'replies_%s_*' % board],
         desc=True,
         groups=True
     )
@@ -65,6 +69,10 @@ def get_posts(r, board, thread_id):
         groups=True
     )
     return map(_cast_post, posts)
+
+
+def get_subject(r, board_id, thread_id):
+    return r.hget(KEY_POST % {'board': board_id, 'id': thread_id}, 'subject').decode('utf-8')
 
 
 def new_reply(r, request, board_id, thread_id, text):
