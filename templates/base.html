@@ -3,35 +3,40 @@
 <head>
   <meta charset="utf-8">
   <title>{% block title %}pgpchan{% endblock %}</title>
-  {% if RECAPTCHA %}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{% endif %}
+  {%- if RECAPTCHA -%}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{%- endif %}
   <style>
-    abbr { border-bottom: 1px dotted; }
+  abbr { border-bottom: 1px dotted; }
+  input[type="text"], textarea {
+    margin: .25em 0;
+    padding: .5em;
+    border: 1px solid #bfbfbf;
+    width: 400px;
+    font: normal .8em/1.4 sans-serif;
+  }
   </style>
 </head>
 <body>
 
 <header>
+{% block boardlist %}
   [
-  {% for board in BOARDS.values() %}
+  {% for board in BOARDS.values() -%}
     <a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a>
-    {% if not loop.last %}/{% endif %}
-  {% endfor %}
+    {%- if not loop.last %} / {% endif %}
+  {%- endfor %}
   ]
+{%- endblock %}
 </header>
 
 <h1>{{ self.title() }}</h1>
-
 {% block content %}{% endblock %}
-
 <footer>
   <hr>
-  [
-  {% for board in BOARDS.values() %}
-    <a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a>
-    {% if not loop.last %}/{% endif %}
-  {% endfor %}
-  ]
+  {{ self.boardlist() }}
 </footer>
 
+<script>naclReady=!1</script>
+<script src="/static/bower_components/tweetnacl/nacl-fast.min.js" async defer onload="naclReady=!0"></script>
+<script src="/static/app.js" async defer></script>
 </body>
 </html>

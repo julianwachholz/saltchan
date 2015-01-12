@@ -2,23 +2,23 @@
 {% block title %}/{{ board.id }}/ - {{ board.title }} No. {{ thread_id }}{% endblock %}
 
 {% block content %}
-
 <h3>Replies</h3>
 
-{% for post in posts %}
+{% for post in posts -%}
 <article id="id{{ post.id }}">
   <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
-  No. <a href="#id{{ post.id }}">{{ post.id }}</a>
+  No. <a href="#id{{ post.id }}">{{ post.id }}</a><br>
+  {% if loop.first %}
+    <strong>{{ thread_subject }}</strong>
+  {% endif %}
   {{ post.text|nl2br }}
 </article>
 <hr>
 {% endfor %}
-
 <form method="post">
   <h4><abbr>R</abbr>eply:</h4>
   <textarea rows="6" cols="40" name="text" accesskey="r" tabindex="1" required></textarea><br>
-  {% if RECAPTCHA %}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{% endif %}
+  {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
 </form>
-
 {% endblock %}
