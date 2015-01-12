@@ -1,8 +1,9 @@
 import re
 import requests
-from flask import Flask, request, redirect, render_template, url_for
+from flask import Flask, abort, request, redirect, render_template, url_for
 from jinja2 import evalcontextfilter, Markup, escape
 from redis import StrictRedis
+from utils import templated
 import config
 import bbs
 
@@ -15,6 +16,7 @@ _RE_PARA = re.compile(r'(?:\r\n|\n){2,}')
 @app.context_processor
 def inject_user():
     return {
+        'RECAPTCHA': config.RECAPTCHA,
         'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
     }
 
@@ -29,58 +31,73 @@ def nl2br(eval_ctx, value):
     return result
 
 
-def _check_recaptcha(request):
-    params = {
-        'secret': config.RECAPTCHA_SECRET,
-        'response': request.form.get('g-recaptcha-response'),
-        'remoteip': request.remote_addr,
-    }
-    url = 'https://www.google.com/recaptcha/api/siteverify?'
-    url += '&'.join('{}={}'.format(key, val) for key, val in params.items())
-    r = requests.get(url)
-    return r.status_code == 200 and r.json()['success']
+def _validate_form(request):
+    """
+    Check if we actually got a text input and verify the captcha.
+
+    """
+    text = request.form.get('text', '').strip()
+    if not text:
+        abort(400)
+
+    if config.RECAPTCHA:
+        params = {
+            'secret': config.RECAPTCHA_SECRET,
+            'response': request.form.get('g-recaptcha-response'),
+            'remoteip': request.remote_addr,
+        }
+        url = 'https://www.google.com/recaptcha/api/siteverify?'
+        url += '&'.join('{}={}'.format(key, val) for key, val in params.items())
+        r = requests.get(url)
+        if not r.json()['success']:
+            abort(400)
+
+    return text
 
 
 @app.route('/')
+@templated('index.html')
 def index():
-    return render_template('index.html',
-                           boards=config.BOARDS,
-                           board_info=config.BOARD_INFO)
+    return {
+        'boards': config.BOARDS,
+    }
 
 
 @app.route('/<board>/', methods=['GET', 'POST'])
-@app.route('/<board>/<int:page>/')
+@app.route('/<board>/<int:page>/', methods=['GET', 'POST'])
+@templated('board.html')
 def board(board, page=1):
-    if board not in config.BOARDS or page > 10:
+    if board not in config.BOARDS.keys() or page > 10:
         return '404', 404
 
     if request.method == 'POST':
-        if not _check_recaptcha(request):
-            return 'Failed CAPTCHA.', 400
-        thread_id = bbs.new_thread(r, board, request.form.get('text'))
+        text = _validate_form(request)
+        thread_id = bbs.new_thread(r, board, text)
         return redirect(url_for('thread', board=board, thread_id=thread_id))
 
     threads = bbs.get_threads(r, board, page - 1)
-    return render_template('board.html',
-                           page=page,
-                           threads=threads,
-                           board=config.BOARD_INFO[board])
+    return {
+        'page': page,
+        'threads': threads,
+        'board': config.BOARDS[board],
+    }
 
 
 @app.route('/<board>/thread/<int:thread_id>', methods=['GET', 'POST'])
+@templated('thread.html')
 def thread(board, thread_id):
     if request.method == 'POST':
-        if not _check_recaptcha(request):
-            return 'Failed CAPTCHA.', 400
+        text = _validate_form(request)
         reply_id = bbs.new_reply(r, board, thread_id, request.form.get('text'))
         thread_url = url_for('thread', board=board, thread_id=thread_id)
         return redirect('%s#id%d' % (thread_url, reply_id))
 
     posts = bbs.get_posts(r, board, thread_id)
-    return render_template('thread.html',
-                           thread_id=thread_id,
-                           posts=posts,
-                           board=config.BOARD_INFO[board])
+    return {
+        'thread_id': thread_id,
+        'posts': posts,
+        'board': config.BOARDS[board],
+    }
 
 
 if __name__ == '__main__':

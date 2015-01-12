@@ -3,11 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>/{{ board.id }}/ - {{ board.title }} No. {{ thread_id }}</title>
-  <script src='https://www.google.com/recaptcha/api.js'></script>
+  {% if RECAPTCHA %}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{% endif %}
+  <style>
+    abbr { border-bottom: 1px dotted; }
+  </style>
 </head>
 <body>
 
-<h1><a href="/{{ board.id }}/">/{{ board.id }}/</a> - {{ board.title }} No. {{ thread_id }}</h1>
+<h1>
+  <a href="{{ url_for('board', board=board.id) }}" accesskey="b">/{{ board.id }}/</a>
+   - {{ board.title }} No. {{ thread_id }}
+</h1>
 
 <h3>Replies</h3>
 
@@ -21,9 +27,10 @@
 {% endfor %}
 
 <form method="post">
-  <h4>Reply:</h4>
-  <textarea rows="6" cols="40" name="text"></textarea><br>
-  <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>
-  <button type="submit">Post reply</button>
+  <h4><abbr>R</abbr>eply:</h4>
+  <textarea rows="6" cols="40" name="text" accesskey="r" tabindex="1" required></textarea><br>
+  {% if RECAPTCHA %}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{% endif %}
+  <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
 </form>
 </body>
+</html>

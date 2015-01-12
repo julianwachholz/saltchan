@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <title>/{{ board.id }}/ - {{ board.title }}</title>
-  <script src='https://www.google.com/recaptcha/api.js'></script>
+  {% if RECAPTCHA %}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{% endif %}
+  <style>
+    abbr { border-bottom: 1px dotted; }
+  </style>
 </head>
 <body>
 <h1>/{{ board.id }}/ - {{ board.title }}</h1>
@@ -13,8 +16,8 @@
 {% for thread in threads %}
 <article id="id{{ thread.id }}">
   <time>{{ thread.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
-  No. <a href="/{{ board.id }}/thread/{{ thread.id }}#id{{ thread.id }}">{{ thread.id }}</a>
-  [<a href="/{{ board.id }}/thread/{{ thread.id }}">Reply</a>]
+  No. <a href="{{ url_for('thread', board=board.id, thread_id=thread.id) }}#id{{ thread.id }}">{{ thread.id }}</a>
+  [<a href="{{ url_for('thread', board=board.id, thread_id=thread.id) }}">Reply</a>]
   {{ thread.reply_count }} Repl{% if thread.reply_count == 1 %}y{% else %}ies{% endif %}
   {{ thread.text|nl2br }}
 </article>
@@ -22,24 +25,25 @@
 {% endfor %}
 
 {% if page == 2 %}
-  <a href="/{{ board.id }}/">Back</a>
+  <a href="{{ url_for('board', board=board.id) }}">Back</a>
 {% endif %}
 {% if page > 2 %}
-  <a href="/{{ board.id }}/{{ page - 1 }}/">Back</a>
+  <a href="{{ url_for('board', board=board.id, page=page-1) }}">Back</a>
 {% endif %}
 {% if page < 10 %}
-  <a href="/{{ board.id }}/{{ page + 1 }}/">Next</a>
+  <a href="{{ url_for('board', board=board.id, page=page+1) }}">Next</a>
 {% endif %}
 
 <form method="post">
-  <h4>Start new thread:</h4>
-  <textarea rows="6" cols="40" name="text"></textarea><br>
-  <div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>
-  <button type="submit">New thread</button>
+  <h4>Sta<abbr>r</abbr>t new thread:</h4>
+  <textarea rows="6" cols="40" name="text" accesskey="r" tabindex="1" required></textarea>
+  <br>{% if RECAPTCHA %}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{% endif %}
+  <button type="submit" accesskey="s" tabindex="2">New thread</button>
 </form>
 
 <footer>
   <hr>
-  <a href="/">Return</a>
+  <a href="/" accesskey="b">Return</a>
 </footer>
 </body>
+</html>

@@ -1,12 +1,7 @@
 import os
 
 
-BOARDS = [
-    'b',
-    'r9k',
-]
-
-BOARD_INFO = {
+BOARDS = {
     'b': {
         'id': 'b',
         'title': 'Random',
@@ -20,7 +15,9 @@ BOARD_INFO = {
 THREADS_PER_PAGE = 10
 
 
-RECAPTCHA = bool(os.environ.get('RECAPTCHA', True))
+RECAPTCHA = bool(os.environ.get('RECAPTCHA', False))
+RECAPTCHA_KEY = None
+RECAPTCHA_SECRET = None
 
 if RECAPTCHA:
     RECAPTCHA_KEY = os.environ.get('RECAPTCHA_KEY')
