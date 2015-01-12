@@ -1,0 +1,10 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>pgpchan</title>
+
+<h1>pgpchan</h1>
+
+/
+{% for board in boards %}
+    <a href="{{ url_for('board', board=board) }}" title="{{ board_info[board].title }}">{{ board }}</a> /
+{% endfor %}
