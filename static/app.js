@@ -9,8 +9,6 @@ var threadKeys = {
     box: null
 };
 
-window.keys = threadKeys;
-
 function $(id) {
     return d.getElementById(id);
 }
