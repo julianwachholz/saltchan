@@ -13,12 +13,11 @@ import bbs
 app = Flask(__name__)
 r = StrictRedis(host='localhost', port=6379, db=1)
 
-_RE_PARA = re.compile(r'(?:\r\n|\n){2,}')
-
 
 @app.context_processor
 def app_context():
     return {
+        'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
         'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
@@ -39,16 +38,6 @@ def error(error=None):
         'error': config.ERRORS.get(error, 'Unknown error.'),
         'is_redirect': True,
     }
-
-
-@app.template_filter()
-@evalcontextfilter
-def nl2br(eval_ctx, value):
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
-                          for p in _RE_PARA.split(escape(value)))
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
 
 
 def _validate_form(request, with_subject=False):
@@ -95,7 +84,7 @@ def index():
 @app.route('/<board_id>/<int:page>/', methods=['GET', 'POST'])
 @templated('board.html')
 def board(board_id, page=1):
-    if board_id not in config.BOARDS.keys() or page > 10:
+    if board_id not in config.BOARDS.keys() or page > config.MAX_PAGES:
         abort(404)
 
     if request.method == 'POST':
