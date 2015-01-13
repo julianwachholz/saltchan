@@ -68,8 +68,10 @@
   </div>
 </footer>
 
+{% block js %}
 <script>naclReady=!1</script>
 <script src="/static/bower_components/tweetnacl/nacl-fast.min.js" async defer onload="naclReady=!0"></script>
 <script src="/static/app.js" async defer></script>
+{% endblock %}
 </body>
 </html>

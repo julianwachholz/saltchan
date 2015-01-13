@@ -13,21 +13,6 @@ function $(id) {
     return d.getElementById(id);
 }
 
-function submit(event) {
-    var mode = this.getAttribute('data-mode');
-    event.preventDefault();
-
-    if (!naclReady) {
-        console.error('tweetnacl not ready');
-    }
-    if (mode === 'thread') {
-        submitThread(this);
-    }
-    if (mode === 'reply') {
-        submitReply(this);
-    }
-}
-
 function submitThread(form) {
     // we need two keypairs, one for encryption and
     // another one for signing the message
@@ -115,10 +100,16 @@ function verifyPost(post) {
     infoEl.replaceChild(badge, infoEl.getElementsByClassName('badge')[0]);
 }
 
-function tryVerify() {
+function tryVerify(numTry) {
     if (!window.naclReady) {
-        console.debug('nacl not ready, retrying.');
-        return setTimeout(tryVerify, 10);
+        if (numTry > 10) {
+            window.location = '/error/nacl/';
+        } else {
+            console.debug('nacl not ready, retrying #' + numTry);
+            return setTimeout(function () {
+                tryVerify(numTry + 1);
+            }, 100);
+        }
     }
     var posts = [].slice.call(d.querySelectorAll('.js-verify'));
     posts.forEach(function (post) {
@@ -150,14 +141,27 @@ function initThread() {
 function init() {
     var forms = [].slice.call(d.querySelectorAll('form[data-mode]'));
     forms.forEach(function (form) {
-        form.addEventListener('submit', submit);
+        form.addEventListener('submit', function submit(event) {
+            var mode = this.getAttribute('data-mode');
+            event.preventDefault();
+
+            if (!naclReady) {
+                console.error('tweetnacl not ready');
+            }
+            if (mode === 'thread') {
+                submitThread(this);
+            }
+            if (mode === 'reply') {
+                submitReply(this);
+            }
+        });
     });
 
     if ($('meta-thread')) {
         initThread();
     }
 
-    tryVerify();
+    tryVerify(1);
 }
 
 if(d.readyState === 'interactive' || d.readyState === 'complete') {

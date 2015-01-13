@@ -4,6 +4,13 @@
 
   <h2>Error!</h2>
   <p>{{ error }}</p>
-  <a href="javascript:history.go(-1)">Return</a>
+  {% if is_redirect %}
+    <a href="/">Return</a>
+  {% else %}
+    <a href="../">Return</a>
+  {% endif %}
 
 {% endblock %}
+
+Remove scripts from error page.
+{% block js %}{% endblock %}

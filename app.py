@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import re
 import json
 import requests
@@ -24,10 +26,18 @@ def app_context():
 
 
 @app.errorhandler(400)
+@app.route('/error/')
+@app.route('/error/<error>/')
 @templated('error.html')
-def custom400(error):
+def error(error=None):
+    if hasattr(error, 'description'):
+        return {
+            'error': error.description,
+            'is_redirect': False,
+        }
     return {
-        'error': error.description
+        'error': config.ERRORS.get(error, 'Unknown error.'),
+        'is_redirect': True,
     }
 
 

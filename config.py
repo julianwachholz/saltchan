@@ -23,3 +23,7 @@ RECAPTCHA_SECRET = None
 if RECAPTCHA:
     RECAPTCHA_KEY = os.environ.get('RECAPTCHA_KEY')
     RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET')
+
+ERRORS = {
+    'nacl': "The TweetNacl library failed to load. Fix this by running bower install.",
+}
