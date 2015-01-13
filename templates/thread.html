@@ -25,7 +25,7 @@
 {% endfor %}
 <form method="post" data-mode="reply">
   <h4><abbr>R</abbr>eply:</h4>
-  <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="1" required></textarea><br>
+  <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="1" placeholder="Comment" required></textarea><br>
   {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
   <input type="hidden" name="data" id="form-data">

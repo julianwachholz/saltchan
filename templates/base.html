@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   {%- if RECAPTCHA -%}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{%- endif %}
   <style>
+  html, body {
+    font: normal 16px/1.2 sans-serif;
+  }
   abbr { border-bottom: 1px dotted; }
   input[type="text"], textarea {
     margin: .25em 0;
@@ -14,6 +17,9 @@
     width: 90%;
     max-width: 400px;
     font: normal .8em/1.4 sans-serif;
+  }
+  h4 {
+    margin-bottom: 0;
   }
   .info {
     margin-bottom: .3em;
@@ -64,12 +70,13 @@
   {{ self.boardlist() }}
 
   <div class="meta center">
-    Made with <a href="https://dchest.github.io/tweetnacl-js/">tweetnacl.js</a> and <a href="http://flask.pocoo.org/">Flask</a>.
+    Made with <a href="https://dchest.github.io/tweetnacl-js/">TweetNaCl.js</a>
+    and <a href="http://flask.pocoo.org/">Flask</a>.
   </div>
 </footer>
 
 {% block js %}
-<script>naclReady=!1</script>
+<script>naclReady=!1;</script>
 <script src="/static/bower_components/tweetnacl/nacl-fast.min.js" async defer onload="naclReady=!0"></script>
 <script src="/static/app.js" async defer></script>
 {% endblock %}
