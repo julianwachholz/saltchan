@@ -16,7 +16,7 @@
       No. <a href="#id{{ post.id }}">{{ post.id }}</a>
     </span>
   </div>
-  {% if loop.first %}
+  {% if thread_subject and loop.first %}
     <strong>{{ thread_subject }}</strong>
   {% endif %}
   <p class="reply-text">{{ post.data.message }}</p>
