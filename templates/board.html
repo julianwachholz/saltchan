@@ -35,7 +35,7 @@
 {%- if page > 2 -%}
   <a href="{{ url_for('board', board_id=board.id, page=page-1) }}">Back</a>
 {% endif %}
-{%- if page < 10 -%}
+{%- if page < MAX_PAGES -%}
   <a href="{{ url_for('board', board_id=board.id, page=page+1) }}">Next</a>
 {%- endif %}
 

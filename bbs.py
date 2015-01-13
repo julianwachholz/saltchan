@@ -63,6 +63,19 @@ def get_threads(r, board, page=0):
     return map(_cast_post, threads)
 
 
+def purge_thread(r, board):
+    """
+    Purge the oldest thread beyond the bump limit.
+
+    """
+    threads_key = KEY_BOARD % {'board': board}
+    llen = r.llen(threads_key)
+    if not llen > config.THREADS_PER_PAGE * config.MAX_PAGES:
+        return
+    thread_id = r.rpop(threads_key)
+    return thread_id
+
+
 def get_posts(r, board, thread_id):
     posts = r.sort(
         KEY_REPLIES % {'board': board, 'thread': thread_id},
