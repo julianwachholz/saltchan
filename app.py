@@ -67,8 +67,6 @@ def _validate_form(request, with_subject=False):
 
     if with_subject:
         subject = request.form.get('subject', '').strip()
-        if not subject:
-            abort(400, 'Missing subject.')
 
     if config.RECAPTCHA:
         params = {

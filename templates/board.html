@@ -20,7 +20,9 @@
     </span>
     [<a href="{{ url_for('thread', board_id=board.id, thread_id=thread.id) }}">Reply</a>]
   </div>
-  <strong>{{ thread.subject }}</strong>
+  {% if thread.subject %}
+    <strong>{{ thread.subject }}</strong>
+  {% endif %}
   <p class="reply-text">{{ thread.data.message }}</p>
   <span class="meta">{{ thread.reply_count }} Repl{% if thread.reply_count == 1 %}y{% else %}ies{% endif %}</span>
 </article>
@@ -39,7 +41,7 @@
 
 <form method="post" data-mode="thread">
   <h4>Sta<abbr>r</abbr>t new thread:</h4>
-  <input type="text" name="subject" accesskey="r" tabindex="1" placeholder="Subject" maxlength="200" required><br>
+  <input type="text" name="subject" accesskey="r" tabindex="1" placeholder="Subject" maxlength="200"><br>
   <textarea id="form-text" rows="6" cols="40" tabindex="2" placeholder="Comment" required></textarea><br>
   {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="3">New thread</button>
