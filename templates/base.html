@@ -21,11 +21,19 @@
   h4 {
     margin-bottom: 0;
   }
+  label, button {
+    cursor: pointer;
+  }
+  article.encrypted .reply-text {
+    display: none;
+  }
   .info {
     margin-bottom: .3em;
   }
   .reply-text {
-    white-space: pre;
+    white-space: pre-line;
+    max-width: 90%;
+    overflow: hidden;
   }
   .badge {
     padding: 3px;
@@ -40,15 +48,27 @@
     color: #fff;
     background: #f00;
   }
+  .badge.encrypted:after {
+    content: ' ENCRYPTED';
+  }
+  .small, .meta, .badge {
+    font-size: 0.9em;
+  }
   .meta {
     color: #888;
-    font-size: 0.9em;
   }
   .meta a {
     color: #888;
   }
   .center {
     text-align: center;
+  }
+  .postid a {
+    text-decoration: none;
+    color: #000;
+  }
+  .postid a:hover {
+    color: #00f;
   }
   </style>
 </head>

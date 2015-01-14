@@ -5,20 +5,21 @@
 <h3>Replies</h3>
 
 {% for post in posts -%}
-<article id="id{{ post.id }}" class="js-verify"
+<article id="id{{ post.id }}" class="js-verify
+    {%- if post.data.signature == 'ENCRYPTED' %} encrypted{% endif %}"
   data-signature="{{ post.data.signature }}"
   data-pubsign="{{ post.data.pubsign }}"
   data-pubkey="{{ post.data.pubkey }}">
   <div class="info">
+    {% if thread_subject and loop.first %}
+      <strong>{{ thread_subject }}</strong>
+    {% endif %}
     <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
     <span class="badge">{{ post.data.pubsign[0:10] }}</span>
     <span class="postid">
-      No. <a href="#id{{ post.id }}">{{ post.id }}</a>
+      <a href="#id{{ post.id }}">No.</a><a class="js-reply" data-id="{{ post.id }}" href="#">{{ post.id }}</a>
     </span>
   </div>
-  {% if thread_subject and loop.first %}
-    <strong>{{ thread_subject }}</strong>
-  {% endif %}
   <p class="reply-text">{{ post.data.message }}</p>
 </article>
 <hr>
@@ -28,6 +29,9 @@
   <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="1" placeholder="Comment" required></textarea><br>
   {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="2">Po<abbr>s</abbr>t reply</button>
+  <label class="small">
+    <input type="checkbox" id="form-encrypt"> Encrypt to mentioned posters.
+  </label>
   <input type="hidden" name="data" id="form-data">
 </form>
 

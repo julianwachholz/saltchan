@@ -12,6 +12,11 @@ import bbs
 
 app = Flask(__name__)
 r = StrictRedis(host='localhost', port=6379, db=1)
+if config.SENTRY_DSN:
+    from raven.contrib.flask import Sentry
+    sentry = Sentry(app, dsn=config.SENTRY_DSN)
+else:
+    sentry = None
 
 
 @app.context_processor
@@ -49,6 +54,8 @@ def _validate_form(request, with_subject=False):
     try:
         obj = json.loads(data)
     except ValueError:
+        if sentry:
+            sentry.captureException()
         abort(400, 'Invalid JSON received.')
 
     if not obj['message'].strip():
