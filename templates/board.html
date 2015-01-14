@@ -11,6 +11,9 @@
   data-pubsign="{{ thread.data.pubsign }}"
   data-pubkey="{{ thread.data.pubkey }}">
   <div class="info">
+    {% if thread.subject %}
+      <strong>{{ thread.subject }}</strong>
+    {% endif %}
     <time>{{ thread.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
     <span class="badge">{{ thread.data.pubsign[0:10] }}</span>
     <span class="postid">
@@ -20,9 +23,6 @@
     </span>
     [<a href="{{ url_for('thread', board_id=board.id, thread_id=thread.id) }}">Reply</a>]
   </div>
-  {% if thread.subject %}
-    <strong>{{ thread.subject }}</strong>
-  {% endif %}
   <p class="reply-text">{{ thread.data.message }}</p>
   <span class="meta">{{ thread.reply_count }} Repl{% if thread.reply_count == 1 %}y{% else %}ies{% endif %}</span>
 </article>
