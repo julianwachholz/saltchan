@@ -111,8 +111,11 @@ function verifyPost(post) {
 
 function formatPost(el) {
     var raw = el.innerHTML;
-    raw = raw.replace(/&gt;&gt;([0-9]+)/g, '<a href="#id$1">$&</a>');
-    el.innerHTML = raw;
+    el.innerHTML = raw
+        // thread links
+        .replace(/(?:^|\b)&gt;&gt;&gt;([0-9]+)/gm, '<a href="$1">$&</a>')
+        // post links
+        .replace(/(?:^|\b)&gt;&gt;([0-9]+)/gm, '<a href="#id$1">$&</a>');
 }
 
 function tryVerify(numTry) {
