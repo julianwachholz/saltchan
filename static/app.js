@@ -76,12 +76,19 @@ function textColorWhite(rgb) {
     return o <= 125;
 }
 
+function htmlDecode(value) {
+    var e = d.createElement('div');
+    e.innerHTML = value;
+    return e.childNodes.length === 0 ? '' : e.childNodes[0].nodeValue;
+}
+
 function verifyPost(post) {
-    var signature, pubkey, message, badge, badgecolor, infoEl;
+    var signature, pubkey, message, badge, badgecolor, infoEl, contentEl;
 
     signature = decodeVerify(nacl.sign.signatureLength, post.getAttribute('data-signature'));
     pubkey = decodeVerify(nacl.sign.publicKeyLength, post.getAttribute('data-pubsign'));
-    message = nacl.util.decodeUTF8(post.getElementsByClassName('reply-text')[0].innerHTML);
+    contentEl = post.getElementsByClassName('reply-text')[0];
+    message = nacl.util.decodeUTF8(htmlDecode(contentEl.innerHTML));
 
     badge = d.createElement('span');
     if (nacl.sign.detached.verify(message, signature, pubkey)) {
@@ -98,6 +105,14 @@ function verifyPost(post) {
     }
     infoEl = post.getElementsByClassName('info')[0];
     infoEl.replaceChild(badge, infoEl.getElementsByClassName('badge')[0]);
+
+    formatPost(contentEl);
+}
+
+function formatPost(el) {
+    var raw = el.innerHTML;
+    raw = raw.replace(/&gt;&gt;([0-9]+)/g, '<a href="#id$1">$&</a>');
+    el.innerHTML = raw;
 }
 
 function tryVerify(numTry) {
@@ -138,6 +153,21 @@ function initThread() {
     }
 }
 
+function initReply() {
+    var replyLinks = [].slice.call(d.querySelectorAll('.js-reply')),
+        quotePost;
+
+    quotePost = function(event) {
+        var text = $('form-text'), id = this.getAttribute('data-id');
+        event.preventDefault();
+        text.value += '>>' + id + '\n';
+        text.focus();
+    };
+    replyLinks.forEach(function (link) {
+        link.addEventListener('click', quotePost);
+    });
+}
+
 function init() {
     var forms = [].slice.call(d.querySelectorAll('form[data-mode]'));
     forms.forEach(function (form) {
@@ -159,6 +189,7 @@ function init() {
 
     if ($('meta-thread')) {
         initThread();
+        initReply();
     }
 
     tryVerify(1);

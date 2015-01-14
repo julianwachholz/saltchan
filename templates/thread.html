@@ -13,7 +13,8 @@
     <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
     <span class="badge">{{ post.data.pubsign[0:10] }}</span>
     <span class="postid">
-      No. <a href="#id{{ post.id }}">{{ post.id }}</a>
+      <a href="#id{{ post.id }}">No.</a>
+      <a class="js-reply" data-id="{{ post.id }}" href="#">{{ post.id }}</a>
     </span>
   </div>
   {% if thread_subject and loop.first %}
