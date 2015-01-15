@@ -124,6 +124,8 @@ def thread(board_id, thread_id):
 
     posts = bbs.get_posts(r, board_id, thread_id)
     if not posts:
+        if thread_id > bbs.count(r, board_id):
+            abort(404)
         abort(410)
 
     return {
