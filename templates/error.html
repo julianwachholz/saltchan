@@ -3,7 +3,7 @@
 {% block content %}
 
   <h2>Error!</h2>
-  <p>{{ error }}</p>
+  <p>{{ error|safe }}</p>
   {% if is_redirect %}
     <a href="/">Return</a>
   {% else %}

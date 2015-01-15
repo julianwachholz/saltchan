@@ -13,7 +13,8 @@ BOARDS = OrderedDict([
     }),
 ])
 
-THREADS_PER_PAGE = 10
+MAX_PAGES = 3
+THREADS_PER_PAGE = 3
 
 
 RECAPTCHA = bool(os.environ.get('RECAPTCHA', False))

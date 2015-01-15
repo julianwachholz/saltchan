@@ -18,12 +18,11 @@ if config.SENTRY_DSN:
 else:
     sentry = None
 
-_RE_PARA = re.compile(r'(?:\r\n|\n){2,}')
-
 
 @app.context_processor
 def app_context():
     return {
+        'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
         'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
@@ -31,29 +30,25 @@ def app_context():
 
 
 @app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(410)
 @app.route('/error/')
 @app.route('/error/<error>/')
 @templated('error.html')
 def error(error=None):
     if hasattr(error, 'description'):
-        return {
+        code = error.code
+        ctx = {
             'error': error.description,
             'is_redirect': False,
         }
-    return {
-        'error': config.ERRORS.get(error, 'Unknown error.'),
-        'is_redirect': True,
-    }
-
-
-@app.template_filter()
-@evalcontextfilter
-def nl2br(eval_ctx, value):
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
-                          for p in _RE_PARA.split(escape(value)))
-    if eval_ctx.autoescape:
-        result = Markup(result)
-    return result
+    else:
+        code = 400
+        ctx = {
+            'error': config.ERRORS.get(error, 'Unknown error.'),
+            'is_redirect': True,
+        }
+    return render_template('error.html', **ctx), code
 
 
 def _validate_form(request, with_subject=False):
@@ -102,7 +97,7 @@ def index():
 @app.route('/<board_id>/<int:page>/', methods=['GET', 'POST'])
 @templated('board.html')
 def board(board_id, page=1):
-    if board_id not in config.BOARDS.keys() or page > 10:
+    if board_id not in config.BOARDS.keys() or page > config.MAX_PAGES:
         abort(404)
 
     if request.method == 'POST':
@@ -129,7 +124,9 @@ def thread(board_id, thread_id):
 
     posts = bbs.get_posts(r, board_id, thread_id)
     if not posts:
-        abort(404)
+        if thread_id > bbs.count(r, board_id):
+            abort(404)
+        abort(410)
 
     return {
         'thread_id': thread_id,

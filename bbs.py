@@ -50,6 +50,13 @@ def _cast_post(post):
     return postobj
 
 
+def count(r, board):
+    count = r.get(KEY_COUNT % {'board': board})
+    if not count:
+        return 0
+    return int(count)
+
+
 def get_threads(r, board, page=0):
     threads = r.sort(
         KEY_BOARD % {'board': board},
@@ -61,6 +68,31 @@ def get_threads(r, board, page=0):
         groups=True
     )
     return map(_cast_post, threads)
+
+
+def get_stale_threads(r, board):
+    """
+    Get the most recent stale thread_id of the board.
+
+    """
+    threads_key = KEY_BOARD % {'board': board}
+    limit = config.THREADS_PER_PAGE * config.MAX_PAGES
+    while int(r.llen(threads_key)) > limit:
+        yield int(r.rpop(threads_key))
+
+
+def purge_thread(r, board, thread_id):
+    """
+    Obliterate the given thread.
+
+    """
+    replies = r.lrange(KEY_REPLIES % {'board': board, 'thread': thread_id}, 0, -1)
+    r.delete(
+        KEY_BUMP % {'board': board, 'thread': thread_id},
+        KEY_REPLIES % {'board': board, 'thread': thread_id},
+        KEY_REPLY_COUNT % {'board': board, 'thread': thread_id},
+        *[KEY_POST % {'board': board, 'id': int(reply)} for reply in replies]
+    )
 
 
 def get_posts(r, board, thread_id):
