@@ -3,7 +3,6 @@
 Sweep old and stale threads.
 
 """
-from redis import StrictRedis
 import config
 import bbs
 

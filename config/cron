@@ -1,0 +1,6 @@
+#!/bin/bash
+# cronjob that purges stale threads
+
+source /opt/pgpchan/env/bin/activate
+export $(cat /opt/pgpchan/conf/env | grep -v ^# | xargs)
+. /opt/pgpchan/pgpchan/threadpurger.py
