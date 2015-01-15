@@ -30,19 +30,25 @@ def app_context():
 
 
 @app.errorhandler(400)
+@app.errorhandler(404)
+@app.errorhandler(410)
 @app.route('/error/')
 @app.route('/error/<error>/')
 @templated('error.html')
 def error(error=None):
     if hasattr(error, 'description'):
-        return {
+        code = error.code
+        ctx = {
             'error': error.description,
             'is_redirect': False,
         }
-    return {
-        'error': config.ERRORS.get(error, 'Unknown error.'),
-        'is_redirect': True,
-    }
+    else:
+        code = 400
+        ctx = {
+            'error': config.ERRORS.get(error, 'Unknown error.'),
+            'is_redirect': True,
+        }
+    return render_template('error.html', **ctx), code
 
 
 def _validate_form(request, with_subject=False):
@@ -118,7 +124,7 @@ def thread(board_id, thread_id):
 
     posts = bbs.get_posts(r, board_id, thread_id)
     if not posts:
-        abort(404)
+        abort(410)
 
     return {
         'thread_id': thread_id,

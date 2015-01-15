@@ -17,7 +17,7 @@
     <time>{{ thread.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
     <span class="badge">{{ thread.data.pubsign[0:10] }}</span>
     <span class="postid">
-      No. <a href="{{ url_for('thread', board_id=board.id, thread_id=thread.id) }}#id{{ thread.id }}#id{{ thread.id }}">
+      No. <a href="{{ url_for('thread', board_id=board.id, thread_id=thread.id) }}#id{{ thread.id }}">
         {{- thread.id -}}
       </a>
     </span>
