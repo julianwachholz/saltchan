@@ -3,18 +3,15 @@
 PGPchan app file.
 
 """
-import re
 import json
-import requests
 from flask import Flask, abort, request, redirect, render_template, url_for
-from jinja2 import evalcontextfilter, Markup, escape
-from redis import StrictRedis
 from utils import templated
 import config
 import bbs
 
 app = Flask(__name__)
-r = StrictRedis(host='localhost', port=6379, db=1)
+r = config.get_redis()
+
 if config.SENTRY_DSN:
     from raven.contrib.flask import Sentry
     sentry = Sentry(app, dsn=config.SENTRY_DSN)

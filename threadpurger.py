@@ -15,5 +15,5 @@ def main(r):
 
 
 if __name__ == '__main__':
-    r = StrictRedis(host='localhost', port=6379, db=1)
+    r = config.get_redis()
     main(r)
