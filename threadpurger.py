@@ -6,7 +6,9 @@ import bbs
 
 
 def main(r):
-    pass
+    for board in config.BOARDS.keys():
+        for thread_id in bbs.get_stale_threads(r, board):
+            bbs.purge_thread(r, board, thread_id)
 
 
 if __name__ == '__main__':
