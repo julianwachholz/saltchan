@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+"""
+PGPchan app file.
 
+"""
 import re
 import json
 import requests
