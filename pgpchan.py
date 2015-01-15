@@ -4,6 +4,7 @@ PGPchan app file.
 
 """
 import json
+import requests
 from flask import Flask, abort, request, redirect, render_template, url_for
 from utils import templated
 import config
