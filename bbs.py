@@ -136,7 +136,7 @@ def new_reply(r, request, board_id, thread_id, data):
         pipe.hmset(bump_key, {
             'time': now.strftime('%s'),
             'ip': request.remote_addr,
-            'bump': int(last_bump[b'bump']) + 1,
+            'bump': int(last_bump.get(b'bump')) + 1,
         })
 
     pipe.incr(KEY_REPLY_COUNT % {'board': board_id, 'thread': thread_id})
