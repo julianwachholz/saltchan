@@ -101,6 +101,9 @@ def board(board_id, page=1):
     if board_id not in config.BOARDS.keys() or page > config.MAX_PAGES:
         abort(404)
 
+    if page < 1:
+        return redirect(url_for('board', board_id=board_id))
+
     if request.method == 'POST':
         subject, data = _validate_form(request, True)
         thread_id = bbs.new_thread(r, request, board_id, subject, data)

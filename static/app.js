@@ -4,6 +4,9 @@
 (function (d) {
 'use strict';
 
+var NACL_TIMEOUT = 150,
+    NACL_TRIES = 10;
+
 var threadKeys = {
     sign: null,
     box: null
@@ -19,7 +22,7 @@ function submitThread(form) {
     var boxKeyPair = nacl.box.keyPair(),
         signKeyPair = nacl.sign.keyPair(),
 
-        text = $('form-text').value,
+        text = cleanWhitespace($('form-text').value),
         data = $('form-data');
 
     data.value = JSON.stringify({
@@ -39,7 +42,7 @@ function submitReply(form) {
     if (!threadKeys.sign || !threadKeys.box) {
         throw new Error('No signing keys present or not ready!');
     }
-    var text = $('form-text').value,
+    var text = cleanWhitespace($('form-text').value),
         data = $('form-data'),
         signature;
 
@@ -149,7 +152,7 @@ function htmlEncode(value) {
 }
 
 function verifyPost(post) {
-    var signature, pubsign, pubkey, message, contentEl, data, encrypted = false;
+    var signature, pubsign, pubkey, message, contentEl, data;
 
     pubkey = decodeVerify(nacl.box.publicKeyLength, post.getAttribute('data-pubkey'));
     pubsign = decodeVerify(nacl.sign.publicKeyLength, post.getAttribute('data-pubsign'));
@@ -162,7 +165,6 @@ function verifyPost(post) {
             signature = decodeVerify(nacl.sign.signatureLength, data.signature);
             contentEl.innerHTML = htmlEncode(data.text);
             post.classList.remove('encrypted');
-            encrypted = true;
         } catch (e) {
             contentEl.innerHTML = '<em class="meta">Encrypted message.</em>';
             signature = null;
@@ -171,7 +173,7 @@ function verifyPost(post) {
         signature = decodeVerify(nacl.sign.signatureLength, post.getAttribute('data-signature'));
         message = nacl.util.decodeUTF8(htmlDecode(contentEl.innerHTML));
     }
-    formatVerifyMessage(post, message, signature, pubsign, encrypted);
+    formatVerifyMessage(post, message, signature, pubsign);
 }
 
 function tryDecryptPost(theirPubkey, data) {
@@ -199,7 +201,7 @@ function tryDecryptPost(theirPubkey, data) {
     throw new Error('No key found.');
 }
 
-function formatVerifyMessage(post, message, signature, pubkey, encrypted) {
+function formatVerifyMessage(post, message, signature, pubkey) {
     var badge = d.createElement('span'), badgecolor, infoEl;
 
     if (signature !== null) {
@@ -215,35 +217,43 @@ function formatVerifyMessage(post, message, signature, pubkey, encrypted) {
             badge.className = 'badge invalid';
             badge.innerHTML = 'INVALID';
         }
-        if (encrypted) {
-            badge.classList.add('encrypted');
-        }
         infoEl = post.getElementsByClassName('info')[0];
         infoEl.replaceChild(badge, infoEl.getElementsByClassName('badge')[0]);
     }
     formatPost(post.getElementsByClassName('reply-text')[0]);
 }
 
+function cleanWhitespace(text) {
+    return text.replace(/\n{2,}/g, '\n\n').replace(/\n+$/, '');
+}
+
 function formatPost(el) {
     var raw = el.innerHTML;
-    el.innerHTML = raw
+    el.innerHTML = cleanWhitespace(raw)
         // thread links
         .replace(/(?:^|\b)&gt;&gt;&gt;(\d+)/gm, '<a href="$1">$&</a>')
         // post links
         .replace(/(?:^|\b)&gt;&gt;(\d+)/gm, '<a href="#id$1">$&</a>');
 }
 
-function tryVerify(numTry) {
+function waitForNacl(numTry) {
+    // just so we can have all scripts loaded asynchronously
     if (!window.naclReady) {
-        if (numTry > 10) {
+        if (numTry > NACL_TRIES) {
             window.location = '/error/nacl/';
         } else {
             console.debug('nacl not ready, retrying #' + numTry);
             return setTimeout(function () {
-                tryVerify(numTry + 1);
-            }, 100);
+                waitForNacl(numTry + 1);
+            }, NACL_TIMEOUT);
         }
     }
+
+    if ($('meta-thread')) {
+        initThread();
+        initReply();
+    }
+
     var posts = [].slice.call(d.querySelectorAll('.js-verify'));
     posts.forEach(function (post) {
         verifyPost(post);
@@ -305,12 +315,7 @@ function init() {
         });
     });
 
-    if ($('meta-thread')) {
-        initThread();
-        initReply();
-    }
-
-    tryVerify(1);
+    waitForNacl(1);
 }
 
 if(d.readyState === 'interactive' || d.readyState === 'complete') {
