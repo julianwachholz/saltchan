@@ -131,7 +131,7 @@ def thread(board_id, thread_id):
             reply_id = bbs.new_reply(r, request, board_id, thread_id, data)
             thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
             return redirect('%s#id%d' % (thread_url, reply_id))
-        except:
+        except bbs.ReplyLimitError:
             abort(400, 'Thread reply limit reached.')
 
     posts = bbs.get_posts(r, board_id, thread_id)

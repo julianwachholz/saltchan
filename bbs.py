@@ -12,6 +12,10 @@ KEY_REPLIES = 'thread_%(board)s_%(thread)d'
 KEY_REPLY_COUNT = 'replies_%(board)s_%(thread)d'
 
 
+class ReplyLimitError(Exception):
+    pass
+
+
 def new_thread(r, request, board_id, subject, data):
     thread = r.incr(KEY_COUNT % {'board': board_id})
     now = datetime.utcnow()
@@ -25,6 +29,7 @@ def new_thread(r, request, board_id, subject, data):
     pipe.hmset(KEY_BUMP % {'board': board_id, 'thread': thread}, {
         'time': now.strftime('%s'),
         'ip': request.remote_addr,
+        'bump': 1,
     })
     pipe.incr(KEY_REPLY_COUNT % {'board': board_id, 'thread': thread})
     pipe.lpush(KEY_BOARD % {'board': board_id}, thread)
@@ -117,7 +122,7 @@ def get_reply_count(r, board_id, thread_id):
 
 def new_reply(r, request, board_id, thread_id, data):
     if r.llen(KEY_REPLIES % {'board': board_id, 'thread': thread_id}) >= config.MAX_REPLIES:
-        raise Exception('Thread reply limit')
+        raise ReplyLimitError()
 
     post = r.incr(KEY_COUNT % {'board': board_id})
     now = datetime.utcnow()
@@ -125,11 +130,13 @@ def new_reply(r, request, board_id, thread_id, data):
     pipe.hmset(KEY_POST % {'board': board_id, 'id': post}, {'id': post, 'date': str(now), 'data': data})
 
     bump_key = KEY_BUMP % {'board': board_id, 'thread': thread_id}
-    last_bump_ip = r.hget(bump_key, 'ip').decode('utf-8')
-    if last_bump_ip != request.remote_addr:
-        pipe.hmset(KEY_BUMP % {'board': board_id, 'thread': thread_id}, {
+    last_bump = r.hgetall(bump_key)
+    if int(last_bump.get(b'bump', 0)) < config.BOARDS[board_id]['bump_limit'] and \
+       last_bump[b'ip'].decode('utf-8') != request.remote_addr:
+        pipe.hmset(bump_key, {
             'time': now.strftime('%s'),
             'ip': request.remote_addr,
+            'bump': int(last_bump[b'bump']) + 1,
         })
 
     pipe.incr(KEY_REPLY_COUNT % {'board': board_id, 'thread': thread_id})

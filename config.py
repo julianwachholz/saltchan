@@ -11,18 +11,21 @@ BOARDS = OrderedDict([
         'title': 'About pgpchan',
         'subtitle': 'General discussion around pgpchan',
         'description': '/a/ - About pgpchan - Meta discussion around pgpchan etcetera.',
+        'bump_limit': 50,
     }),
     ('b', {
         'id': 'b',
         'title': 'Random',
         'subtitle': 'Well what did you expect?',
         'description': '/b/ - Random - Miscellaneous discussion about no particular topic.',
+        'bump_limit': 25,
     }),
     ('c', {
         'id': 'c',
         'title': 'Clowns',
         'subtitle': 'Don\'t trust people wearing facepaint.',
         'description': '/c/ - Clowns - We cannot explain your disproportionate fear of clowns.',
+        'bump_limit': 25,
     }),
 ])
 
