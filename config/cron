@@ -3,4 +3,4 @@
 
 source /opt/pgpchan/env/bin/activate
 export $(cat /opt/pgpchan/conf/env | grep -v ^# | xargs)
-. /opt/pgpchan/pgpchan/threadpurger.py
+python /opt/pgpchan/pgpchan/threadpurger.py
