@@ -6,7 +6,7 @@
 {{ super() }}
 <meta name="robots" content="noarchive">
 <link rel="canonical" href="http://pgpchan.org{{ url_for('thread', board_id=board.id, thread_id=thread_id) }}">
-<meta id="meta-thread" name="thread-id" value="{{ thread_id }}">
+<meta id="meta-thread" name="thread-id" value="{{ board.id }}-{{ thread_id }}">
 {% endblock %}
 
 {% block content %}
