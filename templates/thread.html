@@ -1,8 +1,21 @@
 {% extends 'base.html' %}
-{% block title %}/{{ board.id }}/ - {{ board.title }} No. {{ thread_id }}{% endblock %}
+
+{% block title %}/{{ board.id }}/ - {{ board.title }} No.{{ thread_id }}{% endblock %}
+
+{% block meta %}
+{{ super() }}
+<meta name="robots" content="noarchive">
+<link rel="canonical" href="http://pgpchan.org{{ url_for('thread', board_id=board.id, thread_id=thread_id) }}">
+<meta id="meta-thread" name="thread-id" value="{{ thread_id }}">
+{% endblock %}
 
 {% block content %}
 <h3>Replies</h3>
+
+<nav class="threadnav">
+  [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
+  [<a href="#bottom">Bottom</a>]
+</nav>
 
 {% for post in posts -%}
 <article id="id{{ post.id }}" class="js-verify
@@ -21,9 +34,18 @@
     </span>
   </div>
   <p class="reply-text">{{ post.data.message }}</p>
+  {% if post.data.signature == 'ENCRYPTED' %}
+    <p class="encrypted-info"><em class="meta">Encrypted message.</em></p>
+  {% endif %}
 </article>
 <hr>
 {% endfor %}
+
+<nav class="threadnav">
+  [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
+  [<a href="#top">Top</a>]
+</nav>
+
 <form method="post" data-mode="reply">
   <h4><abbr>R</abbr>eply:</h4>
   <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="1" placeholder="Comment" required></textarea><br>
@@ -34,6 +56,4 @@
   </label>
   <input type="hidden" name="data" id="form-data">
 </form>
-
-<meta id="meta-thread" name="thread" value="{{ thread_id }}">
 {% endblock %}

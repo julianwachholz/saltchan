@@ -1,14 +1,22 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>{% block title %}pgpchan{% endblock %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  {% block meta %}
+  <meta name="description" content="Anonymous messaging board with signed and encrypted messages.">
+  {% endblock %}
   {%- if RECAPTCHA -%}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{%- endif %}
   <style>
   html, body {
     font: normal 16px/1.2 sans-serif;
+    color: #222;
   }
+  body {
+    margin: .5em;
+  }
+  #top { position: absolute; top: 0; }
   abbr { border-bottom: 1px dotted; }
   input[type="text"], textarea {
     margin: .25em 0;
@@ -24,18 +32,30 @@
   label, button {
     cursor: pointer;
   }
-  article.encrypted .reply-text {
-    display: none;
+  .encrypted .reply-text {
+    color: transparent;
   }
   .info {
+    color: #555;
+    font-size: 0.9em;
     margin-bottom: .3em;
+  }
+  .info strong {
+    color: #222;
   }
   .reply-text {
     white-space: pre-line;
     max-width: 90%;
     overflow: hidden;
   }
+  .reply-text a {
+    color: #00c;
+  }
+  .reply-text a:hover {
+    color: #c00;
+  }
   .badge {
+    color: #000;
     padding: 3px;
     border-radius: 4px;
     font-size: 0.9em;
@@ -46,42 +66,90 @@
   }
   .badge.invalid {
     color: #fff;
-    background: #f00;
-  }
-  .badge.encrypted:after {
-    content: ' ENCRYPTED';
+    background: #c00;
   }
   .small, .meta, .badge {
-    font-size: 0.9em;
+    font-size: 0.7em;
   }
-  .meta {
-    color: #888;
-  }
-  .meta a {
+  .meta, .meta a {
     color: #888;
   }
   .center {
     text-align: center;
   }
-  .postid a {
-    text-decoration: none;
-    color: #000;
+  .threadnav {
+    margin-bottom: 1em;
   }
-  .postid a:hover {
-    color: #00f;
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .info a, nav a {
+    text-decoration: none;
+    color: inherit;
+  }
+  .info a:hover, nav a:hover {
+    color: #00c;
+  }
+  article:target {
+    background: #fcf0f0;
+  }
+  nav {
+    font-size: 0.8em;
+  }
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  nav li, nav :after, nav :before {
+    float: left;
+  }
+  nav ul:before {
+    content: '[';
+    margin: 0 2px 0 0;
+  }
+  nav ul:after {
+    content: ']';
+    margin: 0 0 0 2px;
+  }
+  nav li:after {
+    content: '/';
+    margin: 0 3px;
+  }
+  nav li:first-child:after {
+    content: '';
+    margin: 0;
+  }
+  footer .meta {
+    margin-top: 1em;
+  }
+  @media only screen and (min-width: 641px) {
+    body {
+      margin: 2em;
+    }
+    .small, .meta, .badge {
+      font-size: 0.9em;
+    }
   }
   </style>
 </head>
 <body>
+<a id="top" tabindex="-1"></a>
 
 <header>
-{% block boardlist %}
-  [
-  {% for board in BOARDS.values() -%}
-    <a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a>
-    {%- if not loop.last %} / {% endif %}
-  {%- endfor %}
-  ]
+{% block boardnav %}
+<nav class="row">
+  <ul>
+    {% for board in BOARDS.values() -%}
+      <li><a href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">{{ board.id }}</a></li>
+    {%- endfor %}
+  </ul>
+  <ul>
+    <li><a accesskey="/" href="/">Home</a></li>
+  </ul>
+</nav>
 {%- endblock %}
 </header>
 
@@ -89,13 +157,14 @@
 {% block content %}{% endblock %}
 <footer>
   <hr>
-  {{ self.boardlist() }}
+  {{ self.boardnav() }}
 
   <div class="meta center">
     Made with <a href="https://dchest.github.io/tweetnacl-js/">TweetNaCl.js</a>
     and <a href="http://flask.pocoo.org/">Flask</a>.
   </div>
 </footer>
+<a id="bottom" tabindex="-1"></a>
 
 {% block js %}
 <script>naclReady=!1;</script>

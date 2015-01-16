@@ -6,9 +6,23 @@ from collections import OrderedDict
 # Content and behaviour settings
 #
 BOARDS = OrderedDict([
+    ('a', {
+        'id': 'a',
+        'title': 'About pgpchan',
+        'subtitle': 'General discussion around pgpchan',
+        'description': '/a/ - About pgpchan - Meta discussion around pgpchan etcetera.',
+    }),
     ('b', {
         'id': 'b',
         'title': 'Random',
+        'subtitle': 'Well what did you expect?',
+        'description': '/b/ - Random - Miscellaneous discussion about no particular topic.',
+    }),
+    ('c', {
+        'id': 'c',
+        'title': 'Clowns',
+        'subtitle': 'Don\'t trust people wearing facepaint.',
+        'description': '/c/ - Clowns - We cannot explain your disproportionate fear of clowns.',
     }),
 ])
 
