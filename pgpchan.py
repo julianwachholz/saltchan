@@ -23,6 +23,7 @@ else:
 @app.context_processor
 def app_context():
     return {
+        'SUBJECT_MAXLEN': config.SUBJECT_MAXLEN,
         'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
@@ -70,6 +71,9 @@ def _validate_form(request, with_subject=False):
 
     if with_subject:
         subject = request.form.get('subject', '').strip()
+
+        if len(subject) > config.SUBJECT_MAXLEN:
+            abort(400, 'Subject is too long.')
 
     if config.RECAPTCHA:
         params = {

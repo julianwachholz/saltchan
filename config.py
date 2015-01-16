@@ -26,6 +26,8 @@ BOARDS = OrderedDict([
     }),
 ])
 
+SUBJECT_MAXLEN = 200
+
 MAX_PAGES = 10
 THREADS_PER_PAGE = 10
 
