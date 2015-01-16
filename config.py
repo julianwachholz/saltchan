@@ -55,6 +55,7 @@ if RECAPTCHA:
 SENTRY_DSN = os.environ.get('SENTRY_DSN', False)
 
 ERRORS = {
-    'nacl': "The TweetNacl library failed to load. Fix this by running bower install.",
+    '413': "Your request was too large. Try a smaller file or less recipients for an encrypted message.",
     '429': "You are submitting posts too quickly, cool down for a minute.",
+    'nacl': "The TweetNacl library failed to load. Fix this by running bower install.",
 }
