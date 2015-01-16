@@ -24,6 +24,7 @@ else:
 def app_context():
     return {
         'SUBJECT_MAXLEN': config.SUBJECT_MAXLEN,
+        'MAX_REPLIES': config.MAX_REPLIES,
         'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
@@ -125,10 +126,13 @@ def board(board_id, page=1):
 @templated('thread.html')
 def thread(board_id, thread_id):
     if request.method == 'POST':
-        data = _validate_form(request)
-        reply_id = bbs.new_reply(r, request, board_id, thread_id, data)
-        thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
-        return redirect('%s#id%d' % (thread_url, reply_id))
+        try:
+            data = _validate_form(request)
+            reply_id = bbs.new_reply(r, request, board_id, thread_id, data)
+            thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
+            return redirect('%s#id%d' % (thread_url, reply_id))
+        except:
+            abort(400, 'Thread reply limit reached.')
 
     posts = bbs.get_posts(r, board_id, thread_id)
     if not posts:
@@ -139,6 +143,7 @@ def thread(board_id, thread_id):
     return {
         'thread_id': thread_id,
         'thread_subject': bbs.get_subject(r, board_id, thread_id),
+        'thread_replies': bbs.get_reply_count(r, board_id, thread_id),
         'posts': posts,
         'board': config.BOARDS[board_id],
     }

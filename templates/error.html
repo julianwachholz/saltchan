@@ -9,10 +9,12 @@
 
 {% block content %}
 
-  <h2>Error!</h2>
+  <h2>You dun goof'd!</h2>
   <p>{{ error|safe }}</p>
   {% if is_redirect %}
-    <a href="/">Return</a>
+    <a href="/">Home</a>
+  {% elif request.referrer %}
+    <a href="{{ request.referrer }}">Return</a>
   {% else %}
     <a href="../">Return</a>
   {% endif %}

@@ -111,7 +111,14 @@ def get_subject(r, board_id, thread_id):
     return r.hget(KEY_POST % {'board': board_id, 'id': thread_id}, 'subject').decode('utf-8')
 
 
+def get_reply_count(r, board_id, thread_id):
+    return int(r.get(KEY_REPLY_COUNT % {'board': board_id, 'thread': thread_id}))
+
+
 def new_reply(r, request, board_id, thread_id, data):
+    if r.llen(KEY_REPLIES % {'board': board_id, 'thread': thread_id}) >= config.MAX_REPLIES:
+        raise Exception('Thread reply limit')
+
     post = r.incr(KEY_COUNT % {'board': board_id})
     now = datetime.utcnow()
     pipe = r.pipeline()

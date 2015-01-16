@@ -12,10 +12,15 @@
 {% block content %}
 <h3>Replies</h3>
 
-<nav class="threadnav">
-  [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
-  [<a href="#bottom">Bottom</a>]
-</nav>
+<div class="row threadinfo">
+  <nav>
+    [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
+    [<a href="#bottom">Bottom</a>]
+  </nav>
+  <div class="thread-info">
+    {{ thread_replies }} Replies
+  </div>
+</div>
 
 {% for post in posts -%}
 <article id="id{{ post.id }}" class="js-verify
@@ -41,11 +46,19 @@
 <hr>
 {% endfor %}
 
-<nav class="threadnav">
-  [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
-  [<a href="#top">Top</a>]
-</nav>
+<div class="row threadinfo">
+  <nav>
+    [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
+    [<a href="#top">Top</a>]
+  </nav>
+  <div class="thread-info">
+    {{ thread_replies }} Replies
+  </div>
+</div>
 
+{% if thread_replies >= MAX_REPLIES %}
+  <h4>Reply limit reached.</h4>
+{% else %}
 <form method="post" data-mode="reply">
   <h4><abbr>R</abbr>eply:</h4>
   <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="0" placeholder="Comment" required></textarea><br>
@@ -56,4 +69,5 @@
   </label>
   <input type="hidden" name="data" id="form-data">
 </form>
+{% endif %}
 {% endblock %}
