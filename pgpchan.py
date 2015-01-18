@@ -29,6 +29,7 @@ def app_context():
         'BOARDS': config.BOARDS,
         'RECAPTCHA': config.RECAPTCHA,
         'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
+        'DEBUG': app.debug,
     }
 
 
@@ -67,7 +68,7 @@ def _validate_form(request, with_subject=False):
             sentry.captureException()
         abort(400, 'Invalid JSON received.')
 
-    if not obj['message'].strip():
+    if not obj['text'].strip():
         abort(400, 'Empty message.')
 
     if with_subject:

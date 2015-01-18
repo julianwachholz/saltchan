@@ -12,7 +12,7 @@
 <h3>{{ board.subtitle }}</h3>
 
 {% for thread in threads -%}
-<article id="id{{ thread.id }}" class="js-verify"
+<article id="id{{ thread.id }}" class="js-post"
   data-signature="{{ thread.data.signature }}"
   data-pubsign="{{ thread.data.pubsign }}"
   data-pubkey="{{ thread.data.pubkey }}">
@@ -29,7 +29,7 @@
     </span>
     [<a href="{{ url_for('thread', board_id=board.id, thread_id=thread.id) }}">Reply</a>]
   </div>
-  <p class="reply-text">{{ thread.data.message }}</p>
+  <p class="reply-text js-text">{{ thread.data.text }}</p>
   <span class="meta">{{ thread.reply_count }} Repl{% if thread.reply_count == 1 %}y{% else %}ies{% endif %}</span>
 </article>
 <hr>
@@ -45,7 +45,7 @@
   <a href="{{ url_for('board', board_id=board.id, page=page+1) }}">Next</a>
 {%- endif %}
 
-<form method="post" data-mode="thread">
+<form method="post" class="js-form">
   <h4>Sta<abbr>r</abbr>t new thread:</h4>
   <input type="text" name="subject" accesskey="r" tabindex="0" placeholder="Subject" maxlength="{{ SUBJECT_MAXLEN }}"><br>
   <textarea id="form-text" rows="6" cols="40" tabindex="0" placeholder="Comment" required></textarea><br>

@@ -1,2 +1,4 @@
 *.py[co]
 bower_components
+node_modules
+app*.js

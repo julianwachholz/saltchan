@@ -23,7 +23,7 @@
 </div>
 
 {% for post in posts -%}
-<article id="id{{ post.id }}" class="js-verify
+<article id="id{{ post.id }}" class="js-post
     {%- if post.data.signature == 'ENCRYPTED' %} encrypted{% endif %}"
   data-signature="{{ post.data.signature }}"
   data-pubsign="{{ post.data.pubsign }}"
@@ -38,7 +38,7 @@
       <a href="#id{{ post.id }}">No.</a><a class="js-reply" data-id="{{ post.id }}" href="#">{{ post.id }}</a>
     </span>
   </div>
-  <p class="reply-text">{{ post.data.message }}</p>
+  <p class="reply-text js-text">{{ post.data.text }}</p>
   {% if post.data.signature == 'ENCRYPTED' %}
     <p class="encrypted-info"><em class="meta">Encrypted message.</em></p>
   {% endif %}
@@ -59,7 +59,7 @@
 {% if thread_replies >= MAX_REPLIES %}
   <h4>Reply limit reached.</h4>
 {% else %}
-<form method="post" data-mode="reply">
+<form method="post" class="js-form">
   <h4><abbr>R</abbr>eply:</h4>
   <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="0" placeholder="Comment" required></textarea><br>
   {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}

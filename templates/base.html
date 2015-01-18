@@ -33,7 +33,7 @@
     cursor: pointer;
   }
   .encrypted .reply-text {
-    color: transparent;
+    display: none;
   }
   .info {
     color: #555;
@@ -61,12 +61,8 @@
     font-size: 0.9em;
     font-family: monospace;
   }
-  .badge.dark {
+  .badge.text-white {
     color: #fff;
-  }
-  .badge.invalid {
-    color: #fff;
-    background: #c00;
   }
   .small, .meta, .badge {
     font-size: 0.7em;
@@ -166,11 +162,13 @@
 </footer>
 <a id="bottom" tabindex="-1"></a>
 
-{% block js %}
-<script>naclReady=!1;</script>
-<script src="/static/bower_components/tweetnacl/nacl-fast.min.js" async defer onload="naclReady=!0"></script>
-<script src="/static/app.js" async defer></script>
-{% endblock %}
+{% block js -%}
+  {% if DEBUG -%}
+  <script src="/static/app.js" async defer></script>
+  {% else -%}
+  <script src="/static/app.min.js" async defer></script>
+  {%- endif %}
+{%- endblock %}
 <script>
 if (!navigator.doNotTrack) {
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
