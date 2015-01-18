@@ -48,9 +48,10 @@ String::cleanWhitespace = ->
     @replace /\n{2,}/g, '\n\n'
         .replace /\n+$/, ''
 
-String::quoteLinks = ->
+String::formatPost = ->
     @replace /(?:^|\b)&gt;&gt;&gt;(\d+)/gm, '<a href="$1">$&</a>'
         .replace /(?:^|\b)&gt;&gt;(\d+)/gm, '<a href="#id$1">$&</a>'
+        .replace /^&gt;.*$/gm, '<q>$&</q>'
 
 
 ##
@@ -77,7 +78,7 @@ formatPost = (post) ->
     badge = nacl.getBadge(publicKey)
     if nacl.verifySignature dom.htmlDecode(text.value()), signature, publicKey
         info.replaceChild badge, dom('.badge', post).get()
-    text.value text.value().cleanWhitespace().quoteLinks()
+    text.value text.value().cleanWhitespace().formatPost()
     return
 
 
