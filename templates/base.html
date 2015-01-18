@@ -13,6 +13,7 @@
     font: normal 16px/1.2 sans-serif;
     color: #222;
   }
+  * { box-sizing: border-box; }
   body {
     margin: .5em;
   }
@@ -125,12 +126,37 @@
   footer .meta {
     margin-top: 1em;
   }
+  #settings {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #fff;
+    padding: 0.5em 1em;
+    display: none;
+  }
+  #settings.visible {
+    display: block;
+  }
   @media only screen and (min-width: 641px) {
     body {
       margin: 2em;
     }
     .small, .meta, .badge {
       font-size: 0.9em;
+    }
+    #settings {
+      top: 50%;
+      left: 50%;
+      bottom: auto;
+      right: auto;
+      width: 600px;
+      height: 400px;
+      margin: -200px 0 0 -300px;
+      border: 1px solid #c0c0c0;
+      box-shadow: 0 0 30px 10px rgba(0,0,0,0.1);
+      padding: 1.2em 2em;
     }
   }
   </style>
@@ -147,6 +173,7 @@
     {%- endfor %}
   </ul>
   <ul>
+    <li><a accesskey="," href="javascript:settings()">Settings</a></li>
     <li><a accesskey="/" href="/">Home</a></li>
   </ul>
 </nav>

@@ -3,10 +3,7 @@
 
 dom = require './dom'
 nacl = require './naclHelper'
-
-
-CONFIG =
-    USE_LOCALTIME: 'yes' == localStorage.getItem 'config_use_localtime'
+config = require './config'
 
 
 ##
@@ -66,7 +63,7 @@ quoteReply = (event) ->
     text = dom '#form-text'
     replyId = @getAttribute 'data-id'
     text.value += ">>#{replyId}\n"
-    text.focus()
+    text.focus() if not config.QUOTE_NOFOCUS
     return
 
 
@@ -82,7 +79,7 @@ formatPost = (post) ->
     badge = nacl.getBadge(publicKey)
     if nacl.verifySignature dom.htmlDecode(text.value()), signature, publicKey
         info.replaceChild badge, dom('.badge', post).get()
-    if CONFIG.USE_LOCALTIME
+    if config.USE_LOCALTIME
         timeNode = dom('time', post).get()
         localTime = new Date(Date.parse(timeNode.innerHTML) - (new Date().getTimezoneOffset() * 1e3 * 60))
         timeNode.innerHTML = formatDateTime localTime
