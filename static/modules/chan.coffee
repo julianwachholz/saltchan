@@ -5,6 +5,10 @@ dom = require './dom'
 nacl = require './naclHelper'
 
 
+CONFIG =
+    USE_LOCALTIME: 'yes' == localStorage.getItem 'config_use_localtime'
+
+
 ##
 # sign & encrypt a submission if needed
 #
@@ -48,7 +52,7 @@ String::cleanWhitespace = ->
     @replace /\n{2,}/g, '\n\n'
         .replace /\n+$/, ''
 
-String::formatPost = ->
+String::formatReply = ->
     @replace /(?:^|\b)&gt;&gt;&gt;(\d+)/gm, '<a href="$1">$&</a>'
         .replace /(?:^|\b)&gt;&gt;(\d+)/gm, '<a href="#id$1">$&</a>'
         .replace /^&gt;.*$/gm, '<q>$&</q>'
@@ -78,9 +82,18 @@ formatPost = (post) ->
     badge = nacl.getBadge(publicKey)
     if nacl.verifySignature dom.htmlDecode(text.value()), signature, publicKey
         info.replaceChild badge, dom('.badge', post).get()
-    text.value text.value().cleanWhitespace().formatPost()
+    if CONFIG.USE_LOCALTIME
+        timeNode = dom('time', post).get()
+        localTime = new Date(Date.parse(timeNode.innerHTML) - (new Date().getTimezoneOffset() * 1e3 * 60))
+        timeNode.innerHTML = formatDateTime localTime
+    text.value text.value().cleanWhitespace().formatReply()
     return
 
+formatDateTime = (date) ->
+    "#{date.getFullYear()}-#{if date.getMonth() < 9 then '0' else ''}#{date.getMonth()+1}-#{date.getDate()} " +
+    "#{if date.getHours() < 10 then '0' else ''}#{date.getHours()}" +
+    ":#{if date.getMinutes() < 10 then '0' else ''}#{date.getMinutes()}" +
+    ":#{if date.getSeconds() < 10 then '0' else ''}#{date.getSeconds()}"
 
 decryptPost = (post) ->
     json = nacl.decryptPost post
@@ -97,7 +110,9 @@ module.exports.ready = ->
         .on 'click', quoteReply
 
     dom '.js-post'
-        .each formatPost
+        .each formatPost, () ->
+            document.documentElement.className = ''
+            return
 
     dom '.js-form'
         .on 'submit', formSubmit

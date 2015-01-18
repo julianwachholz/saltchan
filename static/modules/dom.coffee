@@ -18,8 +18,14 @@ class dom
         else
             @elements[0].value or @elements[0].innerHTML
 
-    each: (fn) ->
-        @elements.forEach fn
+    each: (fn, endFn) ->
+        end = @elements.length - 1
+        endFn() if end == -1
+
+        @elements.forEach (e, i) ->
+            fn(e)
+            endFn() if i == end
+            return
         @
 
     on: (event, fn) ->

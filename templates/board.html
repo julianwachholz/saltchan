@@ -3,6 +3,8 @@
 {% block title %}/{{ board.id }}/ - {{ board.title }}{% endblock %}
 
 {% block meta %}
+<script>document.documentElement.className='not-ready'</script>
+<style>.not-ready{visibility:hidden}</style>
 <meta name="description" content="{{ board.description }}">
 <meta name="robots" content="noarchive">
 <link rel="canonical" href="http://pgpchan.org{{ url_for('board', board_id=board.id, page=page) }}">
