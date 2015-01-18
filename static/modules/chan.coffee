@@ -16,7 +16,10 @@ formSubmit = (event) ->
 
     json = nacl.signPost text
     if dom('#form-encrypt')?.checked
-        try recipientKeys = getQuotedPublicKeys json.pubkey, text
+        try
+            recipientKeys = getQuotedPublicKeys json.pubkey, text
+        catch
+            return
         json.text = nacl.encryptPost recipientKeys, json.text, json.signature
         json.signature = 'ENCRYPTED'
     data.value = JSON.stringify json
@@ -31,11 +34,12 @@ getQuotedPublicKeys = (myPublicKey, text) ->
     recipients = [myPublicKey]
     matches = text.match /(^| )>>(\d+)/gm
 
-    for match in matches
-        publicKey = dom('#id' + match.replace '>>', '')
-            .getAttribute 'data-pubkey'
-        if publicKey not in recipients
-            recipients.push publicKey
+    if matches
+        for match in matches
+            publicKey = dom('#id' + match.replace '>>', '')
+                .getAttribute 'data-pubkey'
+            if publicKey not in recipients
+                recipients.push publicKey
 
     if recipients.length < 2 and not confirm "No recipients found, only you will be able to read this.\nContinue?"
         throw new Error()
