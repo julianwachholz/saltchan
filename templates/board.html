@@ -37,15 +37,18 @@
 <hr>
 {% endfor %}
 
-{%- if page == 2 -%}
-  <a href="{{ url_for('board', board_id=board.id) }}">Back</a>
-{% endif %}
-{%- if page > 2 -%}
-  <a href="{{ url_for('board', board_id=board.id, page=page-1) }}">Back</a>
-{% endif %}
-{%- if page < MAX_PAGES -%}
-  <a href="{{ url_for('board', board_id=board.id, page=page+1) }}">Next</a>
-{%- endif %}
+<p>
+  Page {{ page }}
+  {% if page == 2 -%}
+    <a href="{{ url_for('board', board_id=board.id) }}">Back</a>
+  {% endif %}
+  {%- if page > 2 -%}
+    <a href="{{ url_for('board', board_id=board.id, page=page-1) }}">Back</a>
+  {% endif %}
+  {%- if page < MAX_PAGES -%}
+    <a href="{{ url_for('board', board_id=board.id, page=page+1) }}">Next</a>
+  {%- endif %}
+</p>
 
 <form method="post" class="js-form">
   <h4>Sta<abbr>r</abbr>t new thread:</h4>
