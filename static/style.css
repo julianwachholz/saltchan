@@ -1,0 +1,150 @@
+html, body {
+  font: normal 16px/1.2 sans-serif;
+  color: #222;
+}
+* { box-sizing: border-box; }
+body {
+  margin: .5em;
+}
+#top { position: absolute; top: 0; }
+abbr { border-bottom: 1px dotted; }
+input[type="text"], textarea {
+  margin: .25em 0;
+  padding: .5em;
+  border: 1px solid #bfbfbf;
+  width: 90%;
+  max-width: 400px;
+  font: normal .8em/1.4 sans-serif;
+}
+h4 {
+  margin-bottom: 0;
+}
+label, button {
+  cursor: pointer;
+}
+q {
+  quotes: none;
+  color: #789922;
+}
+.encrypted .reply-text {
+  display: none;
+}
+.info {
+  color: #555;
+  font-size: 0.9em;
+  margin-bottom: .3em;
+}
+.info strong {
+  color: #222;
+}
+.reply-text {
+  white-space: pre-line;
+  max-width: 90%;
+  overflow: hidden;
+}
+.reply-text a {
+  color: #00c;
+}
+.reply-text a:hover {
+  color: #c00;
+}
+.badge {
+  color: #000;
+  padding: 3px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-family: monospace;
+}
+.badge.text-white {
+  color: #fff;
+}
+.small, .meta, .badge {
+  font-size: 0.7em;
+}
+.meta, .meta a {
+  color: #888;
+}
+.center {
+  text-align: center;
+}
+.threadinfo {
+  margin-bottom: 1em;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.info a, nav a {
+  text-decoration: none;
+  color: inherit;
+}
+.info a:hover, nav a:hover {
+  color: #00c;
+}
+article:target {
+  background: #fcf0f0;
+}
+nav, .thread-info {
+  font-size: 0.8em;
+}
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+nav li, nav :after, nav :before {
+  float: left;
+}
+nav ul:before {
+  content: '[';
+  margin: 0 2px 0 0;
+}
+nav ul:after {
+  content: ']';
+  margin: 0 0 0 2px;
+}
+nav li:after {
+  content: '/';
+  margin: 0 3px;
+}
+nav li:first-child:after {
+  content: '';
+  margin: 0;
+}
+footer .meta {
+  margin-top: 1em;
+}
+#settings {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #fff;
+  padding: 0.5em 1em;
+  display: none;
+}
+#settings.visible {
+  display: block;
+}
+@media only screen and (min-width: 641px) {
+  body {
+    margin: 2em;
+  }
+  .small, .meta, .badge {
+    font-size: 0.9em;
+  }
+  #settings {
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    width: 600px;
+    height: 400px;
+    margin: -200px 0 0 -300px;
+    border: 1px solid #c0c0c0;
+    box-shadow: 0 0 30px 10px rgba(0,0,0,0.1);
+    padding: 1.2em 2em;
+  }
+}
