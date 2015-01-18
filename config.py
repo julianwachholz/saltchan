@@ -20,13 +20,6 @@ BOARDS = OrderedDict([
         'description': '/b/ - Random - Miscellaneous discussion about no particular topic.',
         'bump_limit': 25,
     }),
-    ('c', {
-        'id': 'c',
-        'title': 'Clowns',
-        'subtitle': 'Don\'t trust people wearing facepaint.',
-        'description': '/c/ - Clowns - We cannot explain your disproportionate fear of clowns.',
-        'bump_limit': 25,
-    }),
 ])
 
 SUBJECT_MAXLEN = 200

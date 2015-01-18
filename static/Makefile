@@ -1,13 +1,14 @@
 
-rel: bower
+rel: deps
 	browserify --bare --no-bundle-external -t coffeeify --extension=".coffee" main.coffee \
 	| uglifyjs - --screw-ie8 --mangle --compress > app.min.js
 
-dev: bower
+dev: deps
 	watchify -d -t coffeeify --extension=".coffee" -o app.js main.coffee
 
-bower:
-	bower install
+deps:
+	bower install tweetnacl ~0.13.0
+	npm install coffeeify
 
 # you might want to run this as root
 install:
