@@ -7,7 +7,7 @@ dev: deps
 	watchify -d -t coffeeify --extension=".coffee" -o app.js main.coffee
 
 deps:
-	bower install tweetnacl ~0.13.0
+	bower install tweetnacl#~0.13.0
 	npm install coffeeify
 
 # you might want to run this as root
