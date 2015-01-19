@@ -1,7 +1,7 @@
-pgpchan
-=======
+saltchan
+========
 
-An easy to use anonymous BBS with piece of cake publickey encryption.
+An easy to use almost-anonymous BBS with piece of cake publickey encryption.
 
 Installation
 ============

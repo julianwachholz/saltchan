@@ -3,6 +3,7 @@ import dateutil.parser
 from datetime import datetime
 import config
 
+
 KEY_COUNT = 'count_%(board)s'
 KEY_POST = 'post_%(board)s_%(id)d'
 KEY_BUMP = 'bump_%(board)s_%(thread)d'
