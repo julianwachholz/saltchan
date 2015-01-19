@@ -9,7 +9,7 @@ import config
 import bbs
 
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 r = config.get_redis()
 
 if config.SENTRY_DSN:
