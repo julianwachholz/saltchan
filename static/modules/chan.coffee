@@ -4,6 +4,7 @@
 dom = require './dom'
 nacl = require './naclHelper'
 config = require './config'
+ajax = require '../bower_components/reqwest'
 
 
 ##
@@ -25,6 +26,15 @@ formSubmit = (event) ->
     data.value = JSON.stringify json
     @submit()
     return
+
+
+##
+# update thread
+#
+window.update = ->
+    console.log 'ajaxing!'
+    ajax url: location, success: (data) ->
+        console.log data
 
 
 ##
@@ -90,11 +100,13 @@ formatPost = (post) ->
     text.value text.value().cleanWhitespace().formatReply()
     return
 
+
 formatDateTime = (date) ->
     "#{date.getFullYear()}-#{if date.getMonth() < 9 then '0' else ''}#{date.getMonth()+1}-#{date.getDate()} " +
     "#{if date.getHours() < 10 then '0' else ''}#{date.getHours()}" +
     ":#{if date.getMinutes() < 10 then '0' else ''}#{date.getMinutes()}" +
     ":#{if date.getSeconds() < 10 then '0' else ''}#{date.getSeconds()}"
+
 
 decryptPost = (post) ->
     json = nacl.decryptPost post

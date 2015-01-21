@@ -18,6 +18,7 @@
   <nav>
     [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
     [<a href="#bottom">Bottom</a>]
+    [<a href="javascript:update()">Update</a>]
   </nav>
   <div class="thread-info">
     {{ thread_replies }} Replies
@@ -52,6 +53,7 @@
   <nav>
     [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
     [<a href="#top">Top</a>]
+    [<a href="javascript:update()">Update</a>]
   </nav>
   <div class="thread-info">
     {{ thread_replies }} Replies

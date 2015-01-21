@@ -8,6 +8,7 @@ dev: deps
 
 deps:
 	bower install tweetnacl#~0.13.0
+	bower install reqwest#~1.1.5
 	npm install coffeeify
 
 # you might want to run this as root
