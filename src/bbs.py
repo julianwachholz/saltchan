@@ -73,7 +73,7 @@ def get_threads(r, board, page=0):
         desc=True,
         groups=True
     )
-    return map(_cast_post, threads)
+    return list(map(_cast_post, threads))
 
 
 def get_stale_threads(r, board):
@@ -109,8 +109,12 @@ def get_posts(r, board, thread_id):
         groups=True
     )
     if not posts:
-        return False
-    return map(_cast_post, posts)
+        return []
+    return list(map(_cast_post, posts))
+
+
+def thread_exists(r, board_id, thread_id):
+    return r.exists(KEY_BUMP % {'board': board_id, 'thread': thread_id})
 
 
 def get_subject(r, board_id, thread_id):

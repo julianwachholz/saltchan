@@ -1,8 +1,16 @@
 import json
 import requests
 from functools import wraps
-from flask import abort, request, render_template
+from werkzeug.wrappers import Response
+from flask import abort, jsonify, request, render_template
 import config
+
+
+def _clean_json(obj):
+    if 'board' in obj:
+        obj['board_id'] = obj['board']['id']
+        obj.pop('board', None)
+    return obj
 
 
 def json_or_template(template=None):
@@ -14,15 +22,24 @@ def json_or_template(template=None):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            ctx = f(*args, **kwargs)
+
+            if ctx is None:
+                ctx = {}
+            elif request.is_xhr and getattr(ctx, 'headers', {}).get('Location', False):
+                return jsonify({
+                    'location': ctx.headers['Location'],
+                })
+            elif not isinstance(ctx, dict):
+                return ctx
+
+            if request.is_xhr:
+                return jsonify(_clean_json(ctx))
+
             template_name = template
             if template_name is None:
                 template_name = request.endpoint \
                     .replace('.', '/') + '.html'
-            ctx = f(*args, **kwargs)
-            if ctx is None:
-                ctx = {}
-            elif not isinstance(ctx, dict):
-                return ctx
             return render_template(template_name, **ctx)
         return decorated_function
     return decorator

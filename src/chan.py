@@ -56,6 +56,8 @@ def error(error=None):
             'error': config.ERRORS.get(error, 'Unknown error.'),
             'is_redirect': True,
         }
+    if request.is_xhr:
+        return jsonify(ctx)
     return render_template('error.html', **ctx), code
 
 
