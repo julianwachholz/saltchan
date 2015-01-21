@@ -96,11 +96,17 @@ def thread(board_id, thread_id):
         except bbs.ReplyLimitError:
             abort(400, 'Thread reply limit reached.')
 
-    posts = bbs.get_posts(r, board_id, thread_id)
+    try:
+        start = int(request.args.get('start', 0))
+    except:
+        start = 0
+
+    posts = bbs.get_posts(r, board_id, thread_id, start)
     if not posts:
-        if thread_id > bbs.count(r, board_id):
-            abort(404)
-        abort(410)
+        if not bbs.thread_exists(r, board_id, thread_id):
+            if thread_id > bbs.count(r, board_id):
+                abort(404)
+            abort(410)
 
     return {
         'thread_id': thread_id,

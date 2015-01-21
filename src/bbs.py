@@ -101,10 +101,11 @@ def purge_thread(r, board, thread_id):
     )
 
 
-def get_posts(r, board, thread_id):
+def get_posts(r, board, thread_id, start=0):
     posts = r.sort(
         KEY_REPLIES % {'board': board, 'thread': thread_id},
         by='nosort',
+        start=start, num=config.MAX_REPLIES,
         get=[get(board, 'id'), get(board, 'date'), get(board, 'data')],
         groups=True
     )
