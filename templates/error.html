@@ -13,7 +13,7 @@
   <p>{{ error|safe }}</p>
   {% if is_redirect %}
     <a href="/">Home</a>
-  {% elif request.referrer %}
+  {% elif request.referrer and SITE_URL in request.referrer %}
     <a href="{{ request.referrer }}">Return</a>
   {% else %}
     <a href="../">Return</a>

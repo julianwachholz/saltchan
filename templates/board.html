@@ -2,12 +2,13 @@
 
 {% block title %}/{{ board.id }}/ - {{ board.title }}{% endblock %}
 
-{% block meta %}
+{% block meta %}{# Hide contents until script is ready. #}
 <script>document.documentElement.className='not-ready'</script>
 <style>.not-ready{visibility:hidden}</style>
+
 <meta name="description" content="{{ board.description }}">
 <meta name="robots" content="noarchive">
-<link rel="canonical" href="http://pgpchan.org{{ url_for('board', board_id=board.id, page=page) }}">
+<link rel="canonical" href="{{ SITE_URL }}{{ url_for('board', board_id=board.id, page=page) }}">
 {% endblock %}
 
 {% block content %}

@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  {% block titletag %}<title>{% block title %}{% endblock %} - pgpchan</title>{% endblock %}
+  {% block titletag -%}
+  <title>{% block title %}{% endblock %} - saltchan</title>
+  {%- endblock %}
   <meta name="viewport" content="width=device-width,initial-scale=1">
   {% block meta %}
-  <meta name="description" content="Anonymous messaging board with signed and encrypted messages.">
+  <meta name="description" content="saltchan is an anonymous messaging board with signed and encrypted messages.">
   {% endblock %}
-  {%- if RECAPTCHA -%}<script src="https://www.google.com/recaptcha/api.js" async defer></script>{%- endif %}
+  {%- if RECAPTCHA -%}<script src="//www.google.com/recaptcha/api.js" async defer></script>{%- endif %}
   <link rel="stylesheet" href="/static/style.css">
-{% block js -%}
+  {% block js -%}
   {% if DEBUG -%}
   <script src="/static/app.js" async defer></script>
   {% else -%}
   <script src="/static/app.min.js" async defer></script>
   {%- endif %}
-{%- endblock %}
+  {%- endblock %}
 </head>
 <body>
 <a id="top" tabindex="-1"></a>
@@ -43,8 +45,10 @@
   {{ self.boardnav() }}
 
   <div class="meta center">
-    Made with <a href="https://dchest.github.io/tweetnacl-js/">TweetNaCl.js</a>
-    and <a href="http://flask.pocoo.org/">Flask</a>.
+    Made with
+    <a href="https://dchest.github.io/tweetnacl-js/" target="_blank">TweetNaCl.js</a>,
+    <a href="http://flask.pocoo.org/" target="_blank">Flask</a>, and
+    <a href="http://redis.io/" target="_blank">Redis</a>.
   </div>
 </footer>
 <a id="bottom" tabindex="-1"></a>

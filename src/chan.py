@@ -22,6 +22,7 @@ else:
 @app.context_processor
 def app_context():
     return {
+        'SITE_URL': config.SITE_URL,
         'SUBJECT_MAXLEN': config.SUBJECT_MAXLEN,
         'MAX_REPLIES': config.MAX_REPLIES,
         'MAX_PAGES': config.MAX_PAGES,

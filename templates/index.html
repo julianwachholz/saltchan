@@ -1,11 +1,28 @@
 {% extends 'base.html' %}
 
-{% block titletag %}<title>{% block title %}pgpchan{% endblock %}</title>{% endblock %}
+{% block titletag -%}
+<title>{% block title %}saltchan{% endblock %}</title>
+{%- endblock %}
 
 {% block content %}
 
-  <p>Welcome to pgpchan.</p>
+  <p>Welcome to saltchan.</p>
 
-  <p>This is an anonymous messaging board for everyone. Every post is signed and exchanging encrypted messages is just a checkbox away.</p>
+  <p>
+    <em>saltchan</em> is an anonymous messaging board for everyone. Every post
+    is signed and exchanging encrypted messages is just a checkbox away.
+  </p>
+
+  <h4>Current boards</h4>
+  <p>Select a board from the list below or use the navigation at the top and bottom of the page.</p>
+  <ul>
+    {% for board in BOARDS.values() -%}
+      <li>
+        <a class="clear" href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">
+          {{ board.description }}
+        </a>
+      </li>
+    {%- endfor %}
+  </ul>
 
 {% endblock %}

@@ -5,12 +5,14 @@ from collections import OrderedDict
 # ----
 # Content and behaviour settings
 #
+SITE_URL = 'https://saltchan.org'
+
 BOARDS = OrderedDict([
     ('a', {
         'id': 'a',
-        'title': 'About pgpchan',
-        'subtitle': 'General discussion around pgpchan',
-        'description': '/a/ - About pgpchan - Meta discussion around pgpchan etcetera.',
+        'title': 'About saltchan',
+        'subtitle': 'General discussion around saltchan',
+        'description': '/a/ - About saltchan - Meta discussion around saltchan etcetera.',
         'bump_limit': 50,
     }),
     ('b', {

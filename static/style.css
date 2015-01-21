@@ -64,6 +64,9 @@ q {
 .meta, .meta a {
   color: #888;
 }
+a.clear {
+  color: inherit;
+}
 .center {
   text-align: center;
 }
