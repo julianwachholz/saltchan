@@ -1,6 +1,6 @@
-flask
-redis
-requests
-python-dateutil
-raven[flask]
-uwsgi
+Flask==0.10.1
+redis==2.10.3
+requests==2.5.1
+python-dateutil==2.4.0
+raven[flask]==5.1.1
+uWSGI==2.0.9
