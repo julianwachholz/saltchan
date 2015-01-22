@@ -33,7 +33,6 @@
   <h4>Sta<abbr>r</abbr>t new thread:</h4>
   <input type="text" name="subject" accesskey="r" tabindex="0" placeholder="Subject" maxlength="{{ SUBJECT_MAXLEN }}"><br>
   <textarea id="form-text" rows="6" cols="40" tabindex="0" placeholder="Comment" required></textarea><br>
-  {%- if RECAPTCHA -%}<div class="g-recaptcha" data-sitekey="{{ RECAPTCHA_KEY }}"></div>{%- endif %}
   <button type="submit" accesskey="s" tabindex="0">New thread</button>
   <input type="hidden" name="data" id="form-data">
 </form>

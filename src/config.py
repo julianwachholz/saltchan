@@ -45,14 +45,6 @@ def get_redis():
     from redis import StrictRedis
     return StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 
-RECAPTCHA = bool(os.environ.get('RECAPTCHA', False))
-RECAPTCHA_KEY = None
-RECAPTCHA_SECRET = None
-
-if RECAPTCHA:
-    RECAPTCHA_KEY = os.environ.get('RECAPTCHA_KEY')
-    RECAPTCHA_SECRET = os.environ.get('RECAPTCHA_SECRET')
-
 SENTRY_DSN = os.environ.get('SENTRY_DSN', False)
 
 ERRORS = {

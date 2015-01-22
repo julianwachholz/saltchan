@@ -27,8 +27,6 @@ def app_context():
         'MAX_REPLIES': config.MAX_REPLIES,
         'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
-        'RECAPTCHA': config.RECAPTCHA,
-        'RECAPTCHA_KEY': config.RECAPTCHA_KEY,
         'DEBUG': app.debug,
     }
 

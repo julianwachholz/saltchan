@@ -53,6 +53,9 @@ def validate_post(request, with_subject=False):
     Check if we actually got a text input and verify the captcha.
 
     """
+    if not request.is_xhr:
+        abort(400, 'Invalid request.')
+
     data = request.form.get('data', '')
     try:
         obj = json.loads(data)
@@ -67,18 +70,6 @@ def validate_post(request, with_subject=False):
 
         if len(subject) > config.SUBJECT_MAXLEN:
             abort(400, 'Subject is too long.')
-
-    if config.RECAPTCHA:
-        params = {
-            'secret': config.RECAPTCHA_SECRET,
-            'response': request.form.get('g-recaptcha-response'),
-            'remoteip': request.remote_addr,
-        }
-        url = 'https://www.google.com/recaptcha/api/siteverify?'
-        url += '&'.join('{}={}'.format(key, val) for key, val in params.items())
-        r = requests.get(url)
-        if not r.json()['success']:
-            abort(400, 'ReCAPTCHA challenge failed.')
 
     if with_subject:
         return subject, data
