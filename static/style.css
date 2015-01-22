@@ -85,6 +85,14 @@ a.clear {
 .info a:hover, nav a:hover {
   color: #00c;
 }
+article {
+  border-bottom: 1px solid #888;
+  padding-top: .6em;
+  margin-bottom: .6em;
+}
+article:first-of-type {
+  border-top: 1px solid #888;
+}
 article:target {
   background: #fcf0f0;
 }

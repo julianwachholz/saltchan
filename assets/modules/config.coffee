@@ -15,7 +15,7 @@ createSettings = ->
     <label><input type="checkbox" onchange="localStorage.setItem('config_localtime', this.checked)"
     #{if USE_LOCALTIME then 'checked' else ''}> Show times in my timezone</label><br>
     <label><input type="checkbox" onchange="localStorage.setItem('config_quote_nofocus', this.checked)"
-    #{if QUOTE_NOFOCUS then 'checked' else ''}> Don't scroll down when quoting a post</label><br>
+    #{if QUOTE_NOFOCUS then 'checked' else ''}> Don't scroll down when quoting</label><br>
     <p>Changes take effect after page reload.</p>
     <a href="javascript:settings()">Close</a>
     <a href="javascript:location=location">Reload</a>

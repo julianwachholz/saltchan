@@ -3,6 +3,7 @@ import requests
 from functools import wraps
 from werkzeug.wrappers import Response
 from flask import abort, jsonify, request, render_template
+from flask.json import JSONEncoder
 import config
 
 
@@ -10,6 +11,8 @@ def _clean_json(obj):
     if 'board' in obj:
         obj['board_id'] = obj['board']['id']
         obj.pop('board', None)
+    if 'thread_subject' in obj:
+        obj.pop('thread_subject', None)
     return obj
 
 

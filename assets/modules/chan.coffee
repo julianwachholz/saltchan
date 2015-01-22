@@ -1,5 +1,5 @@
 # chan utils
-# posts verification, encryption and decryption
+# reply verification, encryption and decryption
 
 dom = require './dom'
 nacl = require './naclHelper'
@@ -15,13 +15,13 @@ formSubmit = (event) ->
     text = dom('#form-text').value.cleanWhitespace()
     data = dom '#form-data'
 
-    json = nacl.signPost text
+    json = nacl.signReply text
     if dom('#form-encrypt')?.checked
         try
             recipientKeys = getQuotedPublicKeys json.pubkey, text
         catch
             return
-        json.text = nacl.encryptPost recipientKeys, json.text, json.signature
+        json.text = nacl.encryptReply recipientKeys, json.text, json.signature
         json.signature = 'ENCRYPTED'
     data.value = JSON.stringify json
     @submit()
@@ -29,16 +29,7 @@ formSubmit = (event) ->
 
 
 ##
-# update thread
-#
-window.update = ->
-    console.log 'ajaxing!'
-    ajax url: location, success: (data) ->
-        console.log data
-
-
-##
-# check all mentioned posts and add their public key to recipients
+# check all mentioned replies and add their public key to recipients
 #
 getQuotedPublicKeys = (myPublicKey, text) ->
     recipients = [myPublicKey]
@@ -57,7 +48,7 @@ getQuotedPublicKeys = (myPublicKey, text) ->
     recipients
 
 ##
-# Post formatting
+# Reply formatting
 #
 String::cleanWhitespace = ->
     @replace /\n{2,}/g, '\n\n'
@@ -70,7 +61,7 @@ String::formatReply = ->
 
 
 ##
-# quote a post in your reply
+# quote a reply
 #
 quoteReply = (event) ->
     event.preventDefault()
@@ -82,19 +73,64 @@ quoteReply = (event) ->
 
 
 ##
-# format a post, decrypting it if needed
+# update thread
 #
-formatPost = (post) ->
-    try decryptPost post
-    signature = nacl.getSignature post
-    publicKey = nacl.getSignPublicKey post
-    text = dom('.js-text', post)
-    info = dom('.info', post).get()
-    badge = nacl.getBadge(publicKey)
+makeUpdateFunction = () ->
+    replyCount = parseInt dom('#meta-start').getAttribute 'value'
+    replyList = dom '#js-reply-list'
+    threadReplies = dom '.js-thread-replies'
+
+    ->
+        get = location + "?start=#{replyCount}"
+        ajax url: get, success: (data) ->
+            replyCount = parseInt data.thread_replies
+            threadReplies.value data.thread_replies
+            data.replies.forEach (reply) ->
+                replyList.appendChild makeReplyNode reply
+        return
+
+
+##
+# Create a reply DOM element
+#
+makeReplyNode = (reply) ->
+    el = document.createElement 'article'
+    el.id = "id#{reply.id}"
+    el.className = 'js-reply'
+    el.setAttribute 'data-signature', reply.data.signature
+    el.setAttribute 'data-pubsign', reply.data.pubsign
+    el.setAttribute 'data-pubkey', reply.data.pubkey
+    el.innerHTML = """
+    <div class="info">
+      <time>#{reply.date}</time>
+      <span class="badge">#{reply.data.pubsign[..9]}</span>
+      <span class="replyid">
+        <a href="#id#{reply.id}">No.</a><a class="js-quote" data-id="#{reply.id}" href="#">#{reply.id}</a>
+      </span>
+    </div>
+    <p class="reply-text js-text">#{reply.data.text}</p>
+    """
+    if reply.data.signature == 'ENCRYPTED'
+        el.classList.add 'encrypted'
+        el.innerHTML += '<p class="encrypted-info"><em class="meta">Encrypted message.</em></p>'
+    formatReply(el)
+    el
+
+
+##
+# format a reply, decrypting it if needed
+#
+formatReply = (reply) ->
+    try decryptReply reply
+    signature = nacl.getSignature reply
+    publicKey = nacl.getSignPublicKey reply
+    text = dom('.js-text', reply)
+    info = dom('.info', reply).get()
+    badge = nacl.getBadge publicKey
     if nacl.verifySignature dom.htmlDecode(text.value()), signature, publicKey
-        info.replaceChild badge, dom('.badge', post).get()
+        info.replaceChild badge, dom('.badge', reply).get()
     if config.USE_LOCALTIME
-        timeNode = dom('time', post).get()
+        timeNode = dom('time', reply).get()
         localTime = new Date(Date.parse(timeNode.innerHTML) - (new Date().getTimezoneOffset() * 1e3 * 60))
         timeNode.innerHTML = formatDateTime localTime
     text.value text.value().cleanWhitespace().formatReply()
@@ -108,22 +144,23 @@ formatDateTime = (date) ->
     ":#{if date.getSeconds() < 10 then '0' else ''}#{date.getSeconds()}"
 
 
-decryptPost = (post) ->
-    json = nacl.decryptPost post
-    post.classList.remove 'encrypted'
-    post.setAttribute 'data-signature', json.signature
-    dom('.reply-text', post).value dom.htmlEncode json.text
+decryptReply = (reply) ->
+    json = nacl.decryptReply reply
+    reply.classList.remove 'encrypted'
+    reply.setAttribute 'data-signature', json.signature
+    dom('.reply-text', reply).value dom.htmlEncode json.text
 
 
 module.exports.ready = ->
     if threadId = dom '#meta-thread'
         nacl.initThread threadId.getAttribute 'value'
+        window.update = makeUpdateFunction()
 
-    dom '.js-reply'
+    dom '.js-quote'
         .on 'click', quoteReply
 
-    dom '.js-post'
-        .each formatPost, () ->
+    dom '.js-reply'
+        .each formatReply, () ->
             document.documentElement.className = ''
             return
 

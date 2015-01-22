@@ -1,0 +1,42 @@
+<div id="js-reply-list">
+{% for reply in replies -%}
+  <article id="id{{ reply.id }}" class="js-reply
+      {%- if reply.data.signature == 'ENCRYPTED' %} encrypted{% endif %}"
+      data-signature="{{ reply.data.signature }}"
+      data-pubsign="{{ reply.data.pubsign }}"
+      data-pubkey="{{ reply.data.pubkey }}">
+    <div class="info">
+      {% if reply.subject or thread_subject and loop.first %}
+        <strong>{{ thread_subject|default(reply.subject) }}</strong>
+      {% endif %}
+      <time>{{ reply.date }}</time>
+      <span class="badge">{{ reply.data.pubsign[0:10] }}</span>
+      <span class="replyid">
+      {% if request.endpoint == 'thread' %}
+        <a href="#id{{ reply.id }}">No.</a><a class="js-quote" data-id="{{ reply.id }}" href="#">
+          {{- reply.id -}}
+        </a>
+      {% else %}
+        No.<a href="{{ url_for('thread', board_id=board.id, thread_id=reply.id) }}#id{{ reply.id }}">
+          {{- reply.id -}}
+        </a>
+        [<a href="{{ url_for('thread', board_id=board.id, thread_id=reply.id) }}">Reply</a>]
+      {% endif %}
+      </span>
+    </div>
+    <p class="reply-text js-text">{{ reply.data.text }}</p>
+
+    {% if reply.data.signature == 'ENCRYPTED' %}
+      <p class="encrypted-info"><em class="meta">Encrypted message.</em></p>
+    {% endif %}
+
+    {% if request.endpoint == 'board' %}
+      <span class="meta">
+        {{ reply.reply_count }}
+        {{ reply.reply_count|pluralize('Reply', 'Replies') }}
+      </span>
+    {% endif %}
+
+  </article>
+{% endfor %}
+</div>

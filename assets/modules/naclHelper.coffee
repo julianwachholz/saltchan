@@ -54,23 +54,23 @@ module.exports.initThread = (threadId) ->
 
 
 ##
-# return the signature for a post
+# return the signature for a reply
 #
-module.exports.getSignature = (post) ->
-    signature = post.getAttribute 'data-signature'
+module.exports.getSignature = (reply) ->
+    signature = reply.getAttribute 'data-signature'
     return false if signature == 'ENCRYPTED'
     verifyAndDecodeBase64 nacl.sign.signatureLength, signature
 
 
 ##
-# get the signing publicKey for this post
+# get the signing publicKey for this reply
 #
-module.exports.getSignPublicKey = (post) ->
-    verifyAndDecodeBase64 nacl.sign.publicKeyLength, post.getAttribute 'data-pubsign'
+module.exports.getSignPublicKey = (reply) ->
+    verifyAndDecodeBase64 nacl.sign.publicKeyLength, reply.getAttribute 'data-pubsign'
 
 
 ##
-# verify a signed post
+# verify a signed reply
 #
 module.exports.verifySignature = (text, signature, publicKey) ->
     decodedText = nacl.util.decodeUTF8 text
@@ -105,7 +105,7 @@ module.exports.getBadge = (publicKey) ->
 ##
 # returns an object with text, signature and publickeys
 #
-module.exports.signPost = (text) ->
+module.exports.signReply = (text) ->
     if not threadKeys
         generateNewKeys THREAD_NEW
 
@@ -116,9 +116,9 @@ module.exports.signPost = (text) ->
 
 
 ##
-# encrypt a post for all recipients
+# encrypt a reply for all recipients
 #
-module.exports.encryptPost = (recipientKeys, text, signature) ->
+module.exports.encryptReply = (recipientKeys, text, signature) ->
     data = []
     payload = nacl.util.decodeUTF8 JSON.stringify text: text, signature: signature
 
@@ -136,13 +136,13 @@ module.exports.encryptPost = (recipientKeys, text, signature) ->
 
 
 ##
-# decrypt a post
+# decrypt a reply
 #
-module.exports.decryptPost = (post) ->
-    theirPublicKey = verifyAndDecodeBase64 nacl.box.publicKeyLength, post.getAttribute 'data-pubkey'
+module.exports.decryptReply = (reply) ->
+    theirPublicKey = verifyAndDecodeBase64 nacl.box.publicKeyLength, reply.getAttribute 'data-pubkey'
     myPublicKeyBase64 = nacl.util.encodeBase64 threadKeys.box.publicKey
 
-    for data in JSON.parse dom.htmlDecode dom('.reply-text', post).value()
+    for data in JSON.parse dom.htmlDecode dom('.reply-text', reply).value()
         continue unless data.key == myPublicKeyBase64
         payload = nacl.box.open(
             nacl.util.decodeBase64 data.data
@@ -151,9 +151,9 @@ module.exports.decryptPost = (post) ->
             threadKeys.box.secretKey
         )
         if not payload
-            throw new Error "Failed decrypting post!"
+            throw new Error "Failed decrypting reply!"
         try
             return JSON.parse nacl.util.encodeUTF8 payload
         catch e
-            throw new Error "Failed encoding decrypted post!"
+            throw new Error "Failed encoding decrypted reply!"
     throw new Error "Not encrypted for you!"

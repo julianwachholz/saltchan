@@ -10,6 +10,7 @@
 <meta name="robots" content="noarchive">
 <link rel="canonical" href="{{ SITE_URL }}{{ url_for('thread', board_id=board.id, thread_id=thread_id) }}">
 <meta id="meta-thread" name="thread-id" value="{{ board.id }}-{{ thread_id }}">
+<meta id="meta-start" name="replies-start" value="{{ thread_replies }}">
 {% endblock %}
 
 {% block content %}
@@ -22,33 +23,12 @@
     [<a href="javascript:update()">Update</a>]
   </nav>
   <div class="thread-info">
-    {{ thread_replies }} Replies
+    <span class="js-thread-replies">{{ thread_replies }}</span>
+    {{ thread_replies|pluralize('Reply', 'Replies') }}
   </div>
 </div>
 
-{% for post in posts -%}
-<article id="id{{ post.id }}" class="js-post
-    {%- if post.data.signature == 'ENCRYPTED' %} encrypted{% endif %}"
-  data-signature="{{ post.data.signature }}"
-  data-pubsign="{{ post.data.pubsign }}"
-  data-pubkey="{{ post.data.pubkey }}">
-  <div class="info">
-    {% if thread_subject and loop.first %}
-      <strong>{{ thread_subject }}</strong>
-    {% endif %}
-    <time>{{ post.date.strftime('%Y-%m-%d %H:%M:%S') }}</time>
-    <span class="badge">{{ post.data.pubsign[0:10] }}</span>
-    <span class="postid">
-      <a href="#id{{ post.id }}">No.</a><a class="js-reply" data-id="{{ post.id }}" href="#">{{ post.id }}</a>
-    </span>
-  </div>
-  <p class="reply-text js-text">{{ post.data.text }}</p>
-  {% if post.data.signature == 'ENCRYPTED' %}
-    <p class="encrypted-info"><em class="meta">Encrypted message.</em></p>
-  {% endif %}
-</article>
-<hr>
-{% endfor %}
+{% include '_replies.html' %}
 
 <div class="row threadinfo">
   <nav>
@@ -57,7 +37,8 @@
     [<a href="javascript:update()">Update</a>]
   </nav>
   <div class="thread-info">
-    {{ thread_replies }} Replies
+    <span class="js-thread-replies">{{ thread_replies }}</span>
+    {{ thread_replies|pluralize('Reply', 'Replies') }}
   </div>
 </div>
 

@@ -33,6 +33,13 @@ def app_context():
     }
 
 
+@app.template_filter()
+def pluralize(value, singular, plural):
+    if value == 1:
+        return singular
+    return plural
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -79,7 +86,7 @@ def board(board_id, page=1):
     threads = bbs.get_threads(r, board_id, page - 1)
     return {
         'page': page,
-        'threads': threads,
+        'replies': threads,
         'board': config.BOARDS[board_id],
     }
 
@@ -101,8 +108,9 @@ def thread(board_id, thread_id):
     except:
         start = 0
 
-    posts = bbs.get_posts(r, board_id, thread_id, start)
-    if not posts:
+    replies = bbs.get_replies(r, board_id, thread_id, start)
+
+    if not replies:
         if not bbs.thread_exists(r, board_id, thread_id):
             if thread_id > bbs.count(r, board_id):
                 abort(404)
@@ -112,7 +120,7 @@ def thread(board_id, thread_id):
         'thread_id': thread_id,
         'thread_subject': bbs.get_subject(r, board_id, thread_id),
         'thread_replies': bbs.get_reply_count(r, board_id, thread_id),
-        'posts': posts,
+        'replies': replies,
         'board': config.BOARDS[board_id],
     }
 

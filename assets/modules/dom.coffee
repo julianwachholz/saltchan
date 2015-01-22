@@ -11,10 +11,11 @@ class dom
 
     value: (value) ->
         if value
-            if @elements[0].value
-                @elements[0].value = value
-            else
-                @elements[0].innerHTML = value
+            @each (el) ->
+                if el.value
+                    el.value = value
+                else
+                    el.innerHTML = value
         else
             @elements[0].value or @elements[0].innerHTML
 
@@ -24,7 +25,7 @@ class dom
 
         @elements.forEach (e, i) ->
             fn(e)
-            endFn() if i == end
+            endFn() if i == end and endFn
             return
         @
 

@@ -42,10 +42,11 @@ def new_thread(r, request, board_id, subject, data):
 get = lambda board, field: 'post_%s_*->%s' % (board, field)
 
 
-def _cast_post(post):
+def _cast_reply(post):
+    postdate = dateutil.parser.parse(post[1].decode('utf-8'))
     postobj = {
         'id': int(post[0]),
-        'date': dateutil.parser.parse(post[1].decode('utf-8')),
+        'date': postdate.strftime('%Y-%m-%d %H:%M:%S'),
         'data': json.loads(post[2].decode('utf-8')),
     }
     if len(post) == 5:
@@ -73,7 +74,7 @@ def get_threads(r, board, page=0):
         desc=True,
         groups=True
     )
-    return list(map(_cast_post, threads))
+    return list(map(_cast_reply, threads))
 
 
 def get_stale_threads(r, board):
@@ -101,17 +102,17 @@ def purge_thread(r, board, thread_id):
     )
 
 
-def get_posts(r, board, thread_id, start=0):
-    posts = r.sort(
+def get_replies(r, board, thread_id, start=0):
+    replies = r.sort(
         KEY_REPLIES % {'board': board, 'thread': thread_id},
         by='nosort',
         start=start, num=config.MAX_REPLIES,
         get=[get(board, 'id'), get(board, 'date'), get(board, 'data')],
         groups=True
     )
-    if not posts:
+    if not replies:
         return []
-    return list(map(_cast_post, posts))
+    return list(map(_cast_reply, replies))
 
 
 def thread_exists(r, board_id, thread_id):
