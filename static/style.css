@@ -54,6 +54,10 @@ q {
   border-radius: 4px;
   font-size: 0.9em;
   font-family: monospace;
+  opacity: 0.6;
+}
+.badge:hover {
+  opacity: 1;
 }
 .badge.text-white {
   color: #fff;
