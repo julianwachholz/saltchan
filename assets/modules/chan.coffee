@@ -24,7 +24,17 @@ formSubmit = (event) ->
         json.text = nacl.encryptReply recipientKeys, json.text, json.signature
         json.signature = 'ENCRYPTED'
     data.value = JSON.stringify json
-    @submit()
+    ajaxReply @
+    return
+
+
+ajaxReply = (form) ->
+    data = {}
+    for input in form
+        data[input.name] = input.value if input.name
+    ajax method: 'post', url: location, data: data,
+    success: (json) ->
+        console.log json
     return
 
 

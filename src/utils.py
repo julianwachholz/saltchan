@@ -57,8 +57,6 @@ def validate_post(request, with_subject=False):
     try:
         obj = json.loads(data)
     except ValueError:
-        if sentry:
-            sentry.captureException()
         abort(400, 'Invalid JSON received.')
 
     if not obj['text'].strip():
