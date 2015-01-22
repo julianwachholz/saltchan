@@ -138,8 +138,8 @@ formatReply = (reply) ->
 
 
 formatDateTime = (date) ->
-    "#{date.getFullYear()}-#{if date.getMonth() < 9 then '0' else ''}#{date.getMonth()+1}-#{date.getDate()} " +
-    "#{if date.getHours() < 10 then '0' else ''}#{date.getHours()}" +
+    "#{date.getFullYear()}-#{if date.getMonth() < 9 then '0' else ''}#{date.getMonth()+1}-#{date.getDate()}" +
+    "T#{if date.getHours() < 10 then '0' else ''}#{date.getHours()}" +
     ":#{if date.getMinutes() < 10 then '0' else ''}#{date.getMinutes()}" +
     ":#{if date.getSeconds() < 10 then '0' else ''}#{date.getSeconds()}"
 

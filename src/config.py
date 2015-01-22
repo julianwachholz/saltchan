@@ -30,7 +30,7 @@ MAX_PAGES = 10
 THREADS_PER_PAGE = 10
 MAX_REPLIES = 250
 
-DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 
 
 # ----

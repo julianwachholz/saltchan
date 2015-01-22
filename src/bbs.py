@@ -46,7 +46,7 @@ def _cast_reply(post):
     postdate = dateutil.parser.parse(post[1].decode('utf-8'))
     postobj = {
         'id': int(post[0]),
-        'date': postdate.strftime('%Y-%m-%d %H:%M:%S'),
+        'date': postdate.strftime(config.DATE_FORMAT),
         'data': json.loads(post[2].decode('utf-8')),
     }
     if len(post) == 5:
