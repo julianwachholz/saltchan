@@ -16,7 +16,44 @@ input[type="text"], textarea {
   max-width: 400px;
   font: normal .8em/1.4 sans-serif;
 }
+label.check {
+  display: inline-block;
+  padding-left: 15px;
+  text-indent: -15px;
+}
+.check input {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  padding: 0;
+  margin: 0;
+  vertical-align: bottom;
+  position: relative;
+  top: -1px;
+}
+.error input[type="text"], .error textarea {
+  border-color: #c00;
+}
+.error-message {
+  background: #c00;
+  color: #fff;
+  margin: .25em 0 -.25em 0;
+  padding: .375em;
+  width: 90%;
+  max-width: 400px;
+  display: none;
+}
+.error .error-message {
+  display: block;
+}
+h1 {
+  font-size: 1.4em;
+}
+h3 {
+  font-size: 1em;
+}
 h4 {
+  font-size: .9em;
   margin-bottom: 0;
 }
 label, button {
@@ -149,6 +186,15 @@ footer .meta {
   }
   .small, .meta, .badge {
     font-size: 0.9em;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  h3 {
+    font-size: 1.4em;
+  }
+  h4 {
+    font-size: 1em;
   }
   #settings {
     top: 50%;

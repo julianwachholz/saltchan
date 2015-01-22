@@ -7,6 +7,10 @@ config = require './config'
 ajax = require '../bower_components/reqwest'
 
 
+isThread = no
+autoUpdateEnabled = no
+
+
 ##
 # sign & encrypt a submission if needed
 #
@@ -32,9 +36,21 @@ ajaxReply = (form) ->
     data = {}
     for input in form
         data[input.name] = input.value if input.name
-    ajax method: 'post', url: location, data: data,
+    ajax method: 'post', url: window.location, data: data,
     success: (json) ->
-        console.log json
+        if json?.location and not isThread
+            window.location = json.location
+        if json?.error
+            form.classList.add 'error'
+            dom('.error-message', form).value json.error
+        else
+            form.classList.remove 'error'
+            input.value = '' for input in form
+            if isThread
+                window.update(-> window.location = json.location; return) if isThread
+                if autoUpdateEnabled
+                    window.toggleUpdate true, 10
+        return
     return
 
 
@@ -85,18 +101,70 @@ quoteReply = (event) ->
 ##
 # update thread
 #
-makeUpdateFunction = () ->
+makeUpdateFunction = ->
+    updateLinks = dom '.js-update'
     replyCount = parseInt dom('#meta-start').getAttribute 'value'
     replyList = dom '#js-reply-list'
     threadReplies = dom '.js-thread-replies'
+    replyText = (->
+        singular = threadReplies.get().getAttribute 'data-singular'
+        plural = threadReplies.get().getAttribute 'data-plural'
+        (n) -> n + ' ' + if n == 1 then singular else plural
+    )()
 
-    ->
-        get = location + "?start=#{replyCount}"
+    (fn) ->
+        updateLinks.each (link) ->
+            link.innerHTML = 'Loading...'
+            link.href = 'javascript:false'
+
+        get = window.location.pathname + "?start=#{replyCount}"
         ajax url: get, success: (data) ->
             replyCount = parseInt data.thread_replies
-            threadReplies.value data.thread_replies
+            threadReplies.value replyText data.thread_replies
             data.replies.forEach (reply) ->
                 replyList.appendChild makeReplyNode reply
+            updateLinks.each (link) ->
+                link.innerHTML = 'Update'
+                link.href = 'javascript:update()'
+            fn(data.replies.length) if fn
+        return
+
+
+##
+# toggle thread auto updating
+#
+makeToggleUpdateFunction = ->
+    autoNodes = dom '.js-autoupdate'
+    currentTimeout = 10
+    timer = null
+
+    updateCountdown = (n) ->
+        if n > 0
+            autoNodes.value "Auto (#{n})"
+            timer = setTimeout (-> updateCountdown n - 1), 1e3
+        else
+            autoNodes.value "Auto (...)"
+            window.update (newReplies) ->
+                if newReplies == 0
+                    currentTimeout += Math.round currentTimeout / 2
+                else
+                    currentTimeout = Math.min 20, Math.round currentTimeout / newReplies
+                currentTimeout = Math.min 180, currentTimeout
+                currentTimeout = Math.max 5, currentTimeout
+                updateCountdown currentTimeout
+        return
+
+    (checked, newTimeout) ->
+        if newTimeout
+            currentTimeout = newTimeout
+        if timer
+            clearTimeout timer
+        if checked
+            autoUpdateEnabled = yes
+            updateCountdown currentTimeout
+        else
+            autoUpdateEnabled = no
+            autoNodes.value "Auto"
         return
 
 
@@ -163,8 +231,10 @@ decryptReply = (reply) ->
 
 module.exports.ready = ->
     if threadId = dom '#meta-thread'
+        isThread = yes
         nacl.initThread threadId.getAttribute 'value'
         window.update = makeUpdateFunction()
+        window.toggleUpdate = makeToggleUpdateFunction()
 
     dom '.js-quote'
         .on 'click', quoteReply
