@@ -29,6 +29,7 @@ window.settings = ->
     if not settings
         settings = createSettings()
     settings.classList.toggle('visible')
+    return
 
 
 ##
