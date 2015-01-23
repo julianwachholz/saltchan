@@ -145,10 +145,8 @@ makeToggleUpdateFunction = ->
     timer = null
 
     toggles.on 'click', () ->
-        checked = @checked
-        toggles.each (e) -> e.checked = checked
         currentTimeout = 10
-        toggleUpdate checked
+        toggleUpdate @checked
 
     updateCountdown = (n) ->
         if n > 0
@@ -170,6 +168,7 @@ makeToggleUpdateFunction = ->
             currentTimeout = newTimeout
         if timer
             clearTimeout timer
+        toggles.each (e) -> e.checked = checked
         if checked
             autoUpdateEnabled = yes
             updateCountdown currentTimeout
@@ -248,6 +247,7 @@ module.exports.ready = ->
         nacl.initThread threadId.getAttribute 'value'
         window.update = makeUpdateFunction()
         toggleUpdate = makeToggleUpdateFunction()
+        toggleUpdate true if config.AUTO_UPDATE
 
     dom '.js-quote'
         .on 'click', quoteReply

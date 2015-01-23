@@ -40,3 +40,4 @@ window.settings = ->
 module.exports =
     USE_LOCALTIME: USE_LOCALTIME
     QUOTE_NOFOCUS: QUOTE_NOFOCUS
+    AUTO_UPDATE: AUTO_UPDATE
