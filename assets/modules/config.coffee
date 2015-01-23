@@ -21,7 +21,7 @@ createSettings = ->
     #{if AUTO_UPDATE then 'checked' else ''}> Auto-update threads</label><br>
     <p>Changes take effect after page reload.</p>
     <button onclick="settings()">Close</button>
-    <button onclick="location=location">Reload</button>
+    <button onclick="window.location.reload()">Reload</button>
     """
     document.body.appendChild(div)
     div

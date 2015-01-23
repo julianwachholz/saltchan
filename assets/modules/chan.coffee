@@ -221,8 +221,7 @@ formatReply = (reply) ->
         info.replaceChild badge, dom('.badge', reply).get()
     if config.USE_LOCALTIME
         timeNode = dom('time', reply).get()
-        localTime = new Date(Date.parse(timeNode.innerHTML) - (new Date().getTimezoneOffset() * 1e3 * 60))
-        timeNode.innerHTML = formatDateTime localTime
+        timeNode.innerHTML = formatDateTime new Date timeNode.innerHTML
     text.value text.value().cleanWhitespace().formatReply()
     return
 
