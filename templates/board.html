@@ -6,13 +6,14 @@
 <script>document.documentElement.className='not-ready'</script>
 <style>.not-ready{visibility:hidden}</style>
 
-<meta name="description" content="{{ board.description }}">
+<meta name="description" content="/{{ board.id }}/ - {{ board.title }} - {{ board.description }}">
 <meta name="robots" content="noarchive">
 <link rel="canonical" href="{{ SITE_URL }}{{ url_for('board', board_id=board.id, page=page) }}">
 {% endblock %}
 
 {% block content %}
-<h3>{{ board.subtitle }}</h3>
+
+{% if board.subtitle %}<h3>{{ board.subtitle }}</h3>{% endif %}
 
 {% include '_replies.html' %}
 

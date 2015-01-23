@@ -19,7 +19,7 @@
     {% for board in BOARDS.values() -%}
       <li>
         <a class="clear" href="{{ url_for('board', board_id=board.id) }}" title="{{ board.title }}">
-          {{ board.description }}
+          /{{ board.id }}/ - {{ board.title }}
         </a>
       </li>
     {%- endfor %}

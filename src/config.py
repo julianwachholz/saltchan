@@ -12,16 +12,23 @@ BOARDS = OrderedDict([
         'id': 'a',
         'title': 'About saltchan',
         'subtitle': 'General discussion around saltchan',
-        'description': '/a/ - About saltchan - Meta discussion around saltchan etcetera.',
+        'description': 'Meta discussion about everything related to saltchan etcetera.',
         'bump_limit': 50,
     }),
     ('b', {
         'id': 'b',
         'title': 'Random',
         'subtitle': 'Well what did you expect?',
-        'description': '/b/ - Random - Miscellaneous discussion about no particular topic.',
+        'description': 'Miscellaneous discussion about no particular topic.',
         'bump_limit': 25,
     }),
+    ('g', {
+        'id': 'g',
+        'title': 'Technology',
+        'subtitle': None,
+        'description': 'People come here and discuss various advancements in technology.',
+        'bump_limit': 50,
+    })
 ])
 
 SUBJECT_MAXLEN = 200
