@@ -13,6 +13,7 @@ BOARDS = OrderedDict([
         'title': 'About saltchan',
         'subtitle': 'General discussion around saltchan',
         'description': 'Meta discussion about everything related to saltchan etcetera.',
+        'allow_uploads': False,
         'bump_limit': 50,
     }),
     ('b', {
@@ -20,6 +21,7 @@ BOARDS = OrderedDict([
         'title': 'Random',
         'subtitle': 'Well what did you expect?',
         'description': 'Miscellaneous discussion about no particular topic.',
+        'allow_uploads': True,
         'bump_limit': 25,
     }),
     ('g', {
@@ -27,6 +29,7 @@ BOARDS = OrderedDict([
         'title': 'Technology',
         'subtitle': None,
         'description': 'People come here and discuss various advancements in technology.',
+        'allow_uploads': True,
         'bump_limit': 50,
     })
 ])
@@ -43,9 +46,15 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 # ----
 # Application settings
 #
+APP_PATH = os.path.dirname(os.path.dirname(__file__))
+
+
 REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
 REDIS_PORT = os.environ.get('REDIS_PORT', 6379)
 REDIS_DB = os.environ.get('REDIS_DB', 0)
+
+UPLOAD_ROOT = os.environ.get('UPLOAD_FOLDER', os.path.join(APP_PATH, 'files'))
+UPLOAD_URL = '/files/'
 
 
 def get_redis():

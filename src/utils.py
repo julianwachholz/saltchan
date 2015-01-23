@@ -1,10 +1,13 @@
+import os
 import json
 import requests
 from functools import wraps
+from werkzeug import secure_filename
 from werkzeug.wrappers import Response
 from flask import abort, jsonify, request, render_template
 from flask.json import JSONEncoder
 import config
+import bbs
 
 
 def _clean_json(obj):
@@ -48,7 +51,7 @@ def json_or_template(template=None):
     return decorator
 
 
-def validate_post(request, with_subject=False):
+def validate_post(request, board, r=None, with_subject=False):
     """
     Check if we actually got a text input and verify the captcha.
 
@@ -58,11 +61,11 @@ def validate_post(request, with_subject=False):
 
     data = request.form.get('data', '')
     try:
-        obj = json.loads(data)
+        data = json.loads(data)
     except ValueError:
         abort(400, 'Invalid JSON received.')
 
-    if not obj['text'].strip():
+    if not data['text'].strip():
         abort(400, 'Empty message.')
 
     if with_subject:
@@ -70,6 +73,20 @@ def validate_post(request, with_subject=False):
 
         if len(subject) > config.SUBJECT_MAXLEN:
             abort(400, 'Subject is too long.')
+
+    if request.files.get('file', None):
+        if not board['allow_uploads']:
+            abort(400, 'Uploads not allowed here.')
+
+        file = request.files['file']
+        uploaded_name = secure_filename(file.filename)
+        filename = bbs.filename(r, board['id'], uploaded_name)
+        file.save(os.path.join(config.UPLOAD_ROOT, filename))
+
+        data.update({
+            'file': uploaded_name,
+            'file_url': filename,
+        })
 
     if with_subject:
         return subject, data

@@ -15,8 +15,6 @@ r = config.get_redis()
 if config.SENTRY_DSN:
     from raven.contrib.flask import Sentry
     sentry = Sentry(app, dsn=config.SENTRY_DSN)
-else:
-    sentry = None
 
 
 @app.context_processor
@@ -27,6 +25,7 @@ def app_context():
         'MAX_REPLIES': config.MAX_REPLIES,
         'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
+        'UPLOAD_URL': config.UPLOAD_URL,
         'DEBUG': app.debug,
     }
 
@@ -77,7 +76,7 @@ def board(board_id, page=1):
         return redirect(url_for('board', board_id=board_id))
 
     if request.method == 'POST':
-        subject, data = validate_post(request, True)
+        subject, data = validate_post(request, config.BOARDS[board_id], r=r, with_subject=True)
         thread_id = bbs.new_thread(r, request, board_id, subject, data)
         return redirect(url_for('thread', board_id=board_id, thread_id=thread_id))
 
@@ -94,7 +93,7 @@ def board(board_id, page=1):
 def thread(board_id, thread_id):
     if request.method == 'POST':
         try:
-            data = validate_post(request)
+            data = validate_post(request, config.BOARDS[board_id], r=r)
             reply_id = bbs.new_reply(r, request, board_id, thread_id, data)
             thread_url = url_for('thread', board_id=board_id, thread_id=thread_id)
             return redirect('%s#id%d' % (thread_url, reply_id))
@@ -124,6 +123,12 @@ def thread(board_id, thread_id):
 
 
 if __name__ == '__main__':
+    from flask import send_from_directory
+
+    @app.route(config.UPLOAD_URL + '<filename>')
+    def uploaded_file(filename):
+        return send_from_directory(config.UPLOAD_ROOT, filename)
+
     assert r.ping()
     app.debug = True
     app.run(port=8000)

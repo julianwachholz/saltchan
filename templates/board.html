@@ -30,11 +30,12 @@
   {%- endif %}
 </p>
 
-<form method="post" class="js-form">
+<form method="post" class="js-form"{% if board.allow_uploads %} enctype="multipart/form-data"{% endif %}>
   <h4>Sta<abbr>r</abbr>t new thread:</h4>
   <input type="text" name="subject" accesskey="r" tabindex="0" placeholder="Subject" maxlength="{{ SUBJECT_MAXLEN }}"><br>
   <textarea id="form-text" rows="6" cols="40" tabindex="0" placeholder="Comment" required></textarea><br>
   <button type="submit" accesskey="s" tabindex="0">New thread</button>
+  {% if board.allow_uploads %}<input type="file" name="file" accesskey="f" tabindex="0">{% endif %}
   <input type="hidden" name="data" id="form-data">
 </form>
 {% endblock %}

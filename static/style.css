@@ -74,6 +74,12 @@ q {
 .info strong {
   color: #222;
 }
+.reply-file {
+  width: 250px;
+  max-width: 100%;
+  float: left;
+  margin: .25em 1em 1em 0;
+}
 .reply-text {
   white-space: pre-line;
   max-width: 90%;
@@ -130,6 +136,11 @@ article {
   border-bottom: 1px solid #888;
   padding-top: .6em;
   margin-bottom: .6em;
+}
+article:after {
+  display: table;
+  clear: both;
+  content: '';
 }
 article:first-of-type {
   border-top: 1px solid #888;

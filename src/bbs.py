@@ -11,6 +11,7 @@ KEY_BUMP_SORT = 'bump_%(board)s_*->time'
 KEY_BOARD = 'board_%(board)s'
 KEY_REPLIES = 'thread_%(board)s_%(thread)d'
 KEY_REPLY_COUNT = 'replies_%(board)s_%(thread)d'
+KEY_UPLOADS = 'file_%(board)s'
 
 
 class ReplyLimitError(Exception):
@@ -24,7 +25,7 @@ def new_thread(r, request, board_id, subject, data):
     pipe.hmset(KEY_POST % {'board': board_id, 'id': thread}, {
         'id': thread,
         'date': str(now),
-        'data': data,
+        'data': json.dumps(data),
         'subject': subject,
     })
     pipe.hmset(KEY_BUMP % {'board': board_id, 'thread': thread}, {
@@ -134,7 +135,7 @@ def new_reply(r, request, board_id, thread_id, data):
     post = r.incr(KEY_COUNT % {'board': board_id})
     now = datetime.utcnow()
     pipe = r.pipeline()
-    pipe.hmset(KEY_POST % {'board': board_id, 'id': post}, {'id': post, 'date': str(now), 'data': data})
+    pipe.hmset(KEY_POST % {'board': board_id, 'id': post}, {'id': post, 'date': str(now), 'data': json.dumps(data)})
 
     bump_key = KEY_BUMP % {'board': board_id, 'thread': thread_id}
     last_bump = r.hgetall(bump_key)
@@ -150,3 +151,13 @@ def new_reply(r, request, board_id, thread_id, data):
     pipe.rpush(KEY_REPLIES % {'board': board_id, 'thread': thread_id}, post)
     pipe.execute()
     return post
+
+
+def filename(r, board_id, uploaded_name):
+    """
+    Get a new filename ID.
+
+    """
+    ext = uploaded_name.split('.')[-1]
+    fileid = r.incr(KEY_UPLOADS % {'board': board_id})
+    return '{}.{}'.format(fileid, ext)

@@ -4,7 +4,7 @@
 dom = require './dom'
 nacl = require './naclHelper'
 config = require './config'
-ajax = require '../bower_components/reqwest'
+qwest = require '../bower_components/qwest'
 
 
 isThread = no
@@ -34,11 +34,16 @@ formSubmit = (event) ->
 
 
 ajaxReply = (form) ->
-    data = {}
+    data = new FormData
     for input in form
-        data[input.name] = input.value if input.name
-    ajax method: 'post', url: window.location, data: data,
-    success: (json) ->
+        if input.name == 'file' and input.type == 'file'
+            if input.files[0]
+                data.append 'file', input.files[0]
+        else if input.name
+            data.append input.name, input.value
+
+    qwest.post window.location.pathname, data
+    .then (json) ->
         if json?.location and not isThread
             window.location = json.location
         if json?.error
@@ -118,8 +123,8 @@ makeUpdateFunction = ->
             link.innerHTML = 'Loading...'
             link.href = 'javascript:false'
 
-        get = window.location.pathname + "?start=#{replyCount}"
-        ajax url: get, success: (data) ->
+        qwest.get  window.location.pathname + "?start=#{replyCount}"
+        .then (data) ->
             replyCount = parseInt data.thread_replies
             threadReplies.value replyText data.thread_replies
             data.replies.forEach (reply) ->

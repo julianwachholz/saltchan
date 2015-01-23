@@ -24,6 +24,9 @@
       {% endif %}
       </span>
     </div>
+    {% if reply.data.file %}
+      <img class="reply-file" src="{{ url_for('uploaded_file', filename=reply.data.file_url) }}">
+    {% endif %}
     <p class="reply-text js-text">{{ reply.data.text }}</p>
 
     {% if reply.data.signature == 'ENCRYPTED' %}
