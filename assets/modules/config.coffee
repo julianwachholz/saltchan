@@ -4,6 +4,7 @@ dom = require './dom'
 
 USE_LOCALTIME = 'true' == localStorage.getItem 'config_localtime'
 QUOTE_NOFOCUS = 'true' == localStorage.getItem 'config_quote_nofocus'
+AUTO_UPDATE = 'true' == localStorage.getItem 'config_auto_update'
 
 
 createSettings = ->
@@ -16,9 +17,11 @@ createSettings = ->
     #{if USE_LOCALTIME then 'checked' else ''}> Show times in my timezone</label><br>
     <label><input type="checkbox" onchange="localStorage.setItem('config_quote_nofocus', this.checked)"
     #{if QUOTE_NOFOCUS then 'checked' else ''}> Don't scroll down when quoting</label><br>
+    <label><input type="checkbox" onchange="localStorage.setItem('config_auto_update', this.checked)"
+    #{if AUTO_UPDATE then 'checked' else ''}> Auto-update threads</label><br>
     <p>Changes take effect after page reload.</p>
-    <a href="javascript:settings()">Close</a>
-    <a href="javascript:location=location">Reload</a>
+    <button onclick="settings()">Close</button>
+    <button onclick="location=location">Reload</button>
     """
     document.body.appendChild(div)
     div

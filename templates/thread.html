@@ -21,6 +21,8 @@
     [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
     [<a href="#bottom">Bottom</a>]
     [<a href="javascript:update()" class="js-update">Update</a>]
+    [<label class="check"><input type="checkbox" class="js-autoupdate-checkbox">
+     <span class="js-autoupdate">Auto</span></label>]
   </nav>
   <div class="thread-info">
     <span class="js-thread-replies" data-singular="Reply" data-plural="Replies">
@@ -36,7 +38,7 @@
     [<a href="{{ url_for('board', board_id=board.id) }}">Return</a>]
     [<a href="#top">Top</a>]
     [<a href="javascript:update()" class="js-update">Update</a>]
-    [<label class="check"><input type="checkbox" onchange="toggleUpdate(this.checked)">
+    [<label class="check"><input type="checkbox" class="js-autoupdate-checkbox">
      <span class="js-autoupdate">Auto</span></label>]
   </nav>
   <div class="thread-info">

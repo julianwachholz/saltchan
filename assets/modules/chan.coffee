@@ -9,6 +9,7 @@ ajax = require '../bower_components/reqwest'
 
 isThread = no
 autoUpdateEnabled = no
+toggleUpdate = null
 
 
 ##
@@ -49,7 +50,7 @@ ajaxReply = (form) ->
             if isThread
                 window.update(-> window.location = json.location; return) if isThread
                 if autoUpdateEnabled
-                    window.toggleUpdate true, 10
+                    toggleUpdate true, 10
         return
     return
 
@@ -126,7 +127,11 @@ makeUpdateFunction = ->
             updateLinks.each (link) ->
                 link.innerHTML = 'Update'
                 link.href = 'javascript:update()'
-            fn(data.replies.length) if fn
+            if fn
+                fn(data.replies.length)
+                toggleUpdate autoUpdateEnabled
+            else
+                toggleUpdate autoUpdateEnabled, if data.replies.length > 0 then 10 else 0
         return
 
 
@@ -135,8 +140,15 @@ makeUpdateFunction = ->
 #
 makeToggleUpdateFunction = ->
     autoNodes = dom '.js-autoupdate'
+    toggles = dom '.js-autoupdate-checkbox'
     currentTimeout = 10
     timer = null
+
+    toggles.on 'click', () ->
+        checked = @checked
+        toggles.each (e) -> e.checked = checked
+        currentTimeout = 10
+        toggleUpdate checked
 
     updateCountdown = (n) ->
         if n > 0
@@ -151,10 +163,9 @@ makeToggleUpdateFunction = ->
                     currentTimeout = Math.min 20, Math.round currentTimeout / newReplies
                 currentTimeout = Math.min 180, currentTimeout
                 currentTimeout = Math.max 5, currentTimeout
-                updateCountdown currentTimeout
         return
 
-    (checked, newTimeout) ->
+    toggleUpdate = (checked, newTimeout) ->
         if newTimeout
             currentTimeout = newTimeout
         if timer
@@ -166,6 +177,8 @@ makeToggleUpdateFunction = ->
             autoUpdateEnabled = no
             autoNodes.value "Auto"
         return
+
+    toggleUpdate
 
 
 ##
@@ -234,7 +247,7 @@ module.exports.ready = ->
         isThread = yes
         nacl.initThread threadId.getAttribute 'value'
         window.update = makeUpdateFunction()
-        window.toggleUpdate = makeToggleUpdateFunction()
+        toggleUpdate = makeToggleUpdateFunction()
 
     dom '.js-quote'
         .on 'click', quoteReply
