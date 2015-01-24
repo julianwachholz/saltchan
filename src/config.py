@@ -65,6 +65,8 @@ REDIS_DB = os.environ.get('REDIS_DB', 0)
 UPLOAD_ROOT = os.environ.get('UPLOAD_FOLDER', os.path.join(APP_PATH, 'files'))
 UPLOAD_URL = '/files/'
 
+GA_ID = os.environ.get('GA_ID', None)
+
 
 def get_redis():
     from redis import StrictRedis
@@ -75,5 +77,4 @@ SENTRY_DSN = os.environ.get('SENTRY_DSN', False)
 ERRORS = {
     '413': "Your request was too large. Try a smaller file or less recipients for an encrypted message.",
     '429': "You are submitting posts too quickly, cool down for a minute.",
-    'nacl': "The TweetNacl library failed to load. Fix this by running bower install.",
 }
