@@ -27,12 +27,11 @@
     {% if reply.data.file %}
       <figure class="reply-file">
         <figcaption>
-          <a href="{{ url_for('uploaded_file', filename=reply.data.file_url) }}" target="_blank">
+          <a href="/files/{{ reply.data.file_url }}" target="_blank">
             {{ reply.data.file }}
           </a>
         </figcaption>
-        <img src="{{ url_for('uploaded_file', filename=reply.data.file_url) }}"
-             onclick="this.parentNode.classList.toggle('expand')"
+        <img src="/files/{{ reply.data.file_url }}" onclick="this.parentNode.classList.toggle('expand')"
              data-signature="{{ reply.data.file_signature }}">
         <figcaption class="file-tools">
           <a href="javascript:" onclick="verifyImage(this)">Verify</a>

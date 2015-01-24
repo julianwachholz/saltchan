@@ -26,7 +26,6 @@ def app_context():
         'MAX_REPLIES': config.MAX_REPLIES,
         'MAX_PAGES': config.MAX_PAGES,
         'BOARDS': config.BOARDS,
-        'UPLOAD_URL': config.UPLOAD_URL,
         'DEBUG': app.debug,
     }
 
