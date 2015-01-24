@@ -78,7 +78,9 @@ def validate_post(request, board, r=None, with_subject=False):
         if not board['allow_uploads']:
             abort(400, 'Uploads not allowed here.')
 
+        import magic
         file = request.files['file']
+        verify_file(file)
         uploaded_name = secure_filename(file.filename)
         filename = bbs.filename(r, board['id'], uploaded_name)
         file.save(os.path.join(config.UPLOAD_ROOT, filename))
@@ -91,3 +93,16 @@ def validate_post(request, board, r=None, with_subject=False):
     if with_subject:
         return subject, data
     return data
+
+
+def verify_file(file):
+    """
+    Check the uploaded file if it's a valid image.
+
+    """
+    import magic
+    mime = magic.from_buffer(file.stream.read(config.MIME_READ), mime=True).decode('utf-8')
+    file.stream.seek(0)
+
+    if mime != file.mimetype or mime not in config.ALLOWED_MIME:
+        abort(400, 'File type not allowed: {}'.format(mime))

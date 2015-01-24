@@ -10,6 +10,7 @@ import bbs
 
 
 app = Flask(__name__, template_folder='../templates', static_folder='../static')
+app.config['MAX_CONTENT_LENGTH'] = config.MAX_CONTENT_LENGTH
 r = config.get_redis()
 
 if config.SENTRY_DSN:
@@ -125,7 +126,7 @@ def thread(board_id, thread_id):
 if __name__ == '__main__':
     from flask import send_from_directory
 
-    @app.route(config.UPLOAD_URL + '<filename>')
+    @app.route(config.UPLOAD_URL + '<path:filename>')
     def uploaded_file(filename):
         return send_from_directory(config.UPLOAD_ROOT, filename)
 

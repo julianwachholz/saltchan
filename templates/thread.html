@@ -11,6 +11,7 @@
 <link rel="canonical" href="{{ SITE_URL }}{{ url_for('thread', board_id=board.id, thread_id=thread_id) }}">
 <meta id="meta-thread" name="thread-id" value="{{ board.id }}-{{ thread_id }}">
 <meta id="meta-start" name="replies-start" value="{{ thread_replies }}">
+{% if DEBUG %}<meta id="meta-debug" value="true">{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -56,8 +57,8 @@
   <h4><abbr>R</abbr>eply:</h4>
   <div class="error-message"></div>
   <textarea id="form-text" rows="6" cols="40" accesskey="r" tabindex="0" placeholder="Comment" required></textarea><br>
-  <button type="submit" accesskey="s" tabindex="0">Po<abbr>s</abbr>t reply</button>
-  {% if board.allow_uploads %}<input type="file" name="file" accesskey="f" tabindex="0"><br>{% endif %}
+  <button id="form-submit" type="submit" accesskey="s" tabindex="0">Po<abbr>s</abbr>t reply</button>
+  {% if board.allow_uploads %}<input type="file" id="form-file" accesskey="f" tabindex="0"><br>{% endif %}
   <label class="small check">
     <input type="checkbox" id="form-encrypt"> Encrypt to mentioned posters.
   </label>

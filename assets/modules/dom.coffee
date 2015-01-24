@@ -21,7 +21,7 @@ class dom
 
     each: (fn, endFn) ->
         end = @elements.length - 1
-        endFn() if end == -1
+        endFn() if end == -1 and endFn
 
         @elements.forEach (e, i) ->
             fn(e)

@@ -13,7 +13,7 @@
       <span class="badge">{{ reply.data.pubsign[0:10] }}</span>
       <span class="replyid">
       {% if request.endpoint == 'thread' %}
-        <a href="#id{{ reply.id }}">No.</a><a class="js-quote" data-id="{{ reply.id }}" href="#">
+        <a href="#id{{ reply.id }}">No.</a><a href="javascript:quote({{ reply.id }})">
           {{- reply.id -}}
         </a>
       {% else %}
@@ -25,7 +25,22 @@
       </span>
     </div>
     {% if reply.data.file %}
-      <img class="reply-file" src="{{ url_for('uploaded_file', filename=reply.data.file_url) }}">
+      <figure class="reply-file">
+        <figcaption>
+          <a href="{{ url_for('uploaded_file', filename=reply.data.file_url) }}" target="_blank">
+            {{ reply.data.file }}
+          </a>
+        </figcaption>
+        <img src="{{ url_for('uploaded_file', filename=reply.data.file_url) }}"
+             onclick="this.parentNode.classList.toggle('expand')"
+             data-signature="{{ reply.data.file_signature }}">
+        <figcaption class="file-tools">
+          <a href="javascript:" onclick="verifyImage(this)">Verify</a>
+          {% if reply.data.signature == 'ENCRYPTED' %}
+            <a href="javascript:" onclick="decryptImage(this)" class="js-file-decrypt">Decrypt</a>
+          {% endif %}
+        </figcaption>
+      </figure>
     {% endif %}
     <p class="reply-text js-text">{{ reply.data.text }}</p>
 

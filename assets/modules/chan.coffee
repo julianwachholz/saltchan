@@ -3,13 +3,18 @@
 
 dom = require './dom'
 nacl = require './naclHelper'
+imagelib = require './imagelib'
 config = require './config'
 qwest = require '../bower_components/qwest'
 
+MAX_UPLOAD = 5 * 1024 * 1024
 
 isThread = no
 autoUpdateEnabled = no
 toggleUpdate = null
+
+currentForm = null
+submitText = null
 
 
 ##
@@ -17,46 +22,90 @@ toggleUpdate = null
 #
 formSubmit = (event) ->
     event.preventDefault()
+    submitButton = dom('#form-submit')
+    submitText = submitButton.innerHTML
+    submitButton.innerHTML = 'Working...'
     text = dom('#form-text').value.cleanWhitespace()
     data = dom '#form-data'
-
     json = nacl.signReply text
+    randomKey = null
+    encrypt = no
+
+    currentForm = @
+
     if dom('#form-encrypt')?.checked
         try
             recipientKeys = getQuotedPublicKeys json.pubkey, text
         catch
+            formError 'No recipients for encrypted reply.'
             return
-        json.text = nacl.encryptReply recipientKeys, json.text, json.signature
+        encrypt = yes
+        randomKey = nacl.randomKey()
+        payload = JSON.stringify text: json.text, signature: json.signature
+        encryptObj = nacl.encryptReply recipientKeys, randomKey, payload
+        json.text = JSON.stringify encryptObj
         json.signature = 'ENCRYPTED'
-    data.value = JSON.stringify json
-    ajaxReply @
+
+    fileInput = dom('#form-file')
+    if fileInput?.files.length > 0
+        imagelib.getImageData
+            file: fileInput.files[0]
+            encrypt: encrypt
+            nonce: encryptObj?.nonce
+            secret: randomKey
+            callback: (base64) ->
+                json.file_signature = nacl.sign base64
+                if encrypt
+                    file = imagelib.base64ToBlob base64
+                else file = fileInput.files[0]
+                data.value = JSON.stringify json
+                ajaxReply file, imagelib.filename(file.type, fileInput.files[0].name)
+                return
+    else
+        data.value = JSON.stringify json
+        ajaxReply
     return
 
 
-ajaxReply = (form) ->
+formError = (error) ->
+    dom('#form-submit').innerHTML = submitText
+    if error
+        currentForm.classList.add 'error'
+        dom('.error-message', currentForm).value error
+    else
+       currentForm.classList.remove 'error'
+
+window.formError = formError
+
+
+ajaxReply = (file, filename) ->
     data = new FormData
-    for input in form
-        if input.name == 'file' and input.type == 'file'
-            if input.files[0]
-                data.append 'file', input.files[0]
-        else if input.name
+    for input in currentForm
+        if input.name
             data.append input.name, input.value
+
+    if file.size > MAX_UPLOAD
+        formError "File is too large!"
+        return
+
+    data.append 'file', file, filename if file
 
     qwest.post window.location.pathname, data
     .then (json) ->
         if json?.location and not isThread
             window.location = json.location
         if json?.error
-            form.classList.add 'error'
-            dom('.error-message', form).value json.error
+            formError json.error
         else
-            form.classList.remove 'error'
-            input.value = '' for input in form
+            formError no
+            input.value = '' for input in currentForm
             if isThread
-                window.update(-> window.location = json.location; return) if isThread
+                window.update(-> window.location = json.location; return)
                 if autoUpdateEnabled
-                    toggleUpdate true, 10
+                    toggleUpdate yes, 10
         return
+    .catch (error) ->
+        formError error
     return
 
 
@@ -74,10 +123,10 @@ getQuotedPublicKeys = (myPublicKey, text) ->
             if publicKey not in recipients
                 recipients.push publicKey
 
-    if recipients.length < 2 and not confirm "No recipients found, only you will be able to read this.\nContinue?"
-        throw new Error()
-
+    if recipients.length < 2
+        throw new Error unless dom('#meta-debug')
     recipients
+
 
 ##
 # Reply formatting
@@ -95,11 +144,9 @@ String::formatReply = ->
 ##
 # quote a reply
 #
-quoteReply = (event) ->
-    event.preventDefault()
+window.quote = (id) ->
     text = dom '#form-text'
-    replyId = @getAttribute 'data-id'
-    text.value += ">>#{replyId}\n"
+    text.value += ">>#{id}\n"
     text.focus() if not config.QUOTE_NOFOCUS
     return
 
@@ -200,11 +247,25 @@ makeReplyNode = (reply) ->
       <time>#{reply.date}</time>
       <span class="badge">#{reply.data.pubsign[..9]}</span>
       <span class="replyid">
-        <a href="#id#{reply.id}">No.</a><a class="js-quote" data-id="#{reply.id}" href="#">#{reply.id}</a>
+        <a href="#id#{reply.id}">No.</a><a href="javascript:quote(#{reply.id})">#{reply.id}</a>
       </span>
     </div>
-    <p class="reply-text js-text">#{reply.data.text}</p>
     """
+    if reply.data?.file
+        el.innerHTML += """
+        <figure class="reply-file">
+          <figcaption>
+            <a href="/files/#{reply.data.file_url}" target="_blank">#{reply.data.file}</a>
+          </figcaption>
+          <img src="/files/#{reply.data.file_url}" onclick="this.parentNode.classList.toggle('expand')"
+               data-signature="#{reply.data.file_signature}">
+          <figcaption class="file-tools">
+            <a href="javascript:" onclick="verifyImage(this)">Verify</a>
+            #{if reply.data.signature == 'ENCRYPTED' then '<a href="javascript:" onclick="decryptImage(this)" class="js-file-decrypt">Decrypt</a>' else ''}
+          </figcaption>
+        </figure>
+        """
+    el.innerHTML += """<p class="reply-text js-text">#{reply.data.text}</p>"""
     if reply.data.signature == 'ENCRYPTED'
         el.classList.add 'encrypted'
         el.innerHTML += '<p class="encrypted-info"><em class="meta">Encrypted message.</em></p>'
@@ -251,10 +312,7 @@ module.exports.ready = ->
         nacl.initThread threadId.getAttribute 'value'
         window.update = makeUpdateFunction()
         toggleUpdate = makeToggleUpdateFunction()
-        toggleUpdate true if config.AUTO_UPDATE
-
-    dom '.js-quote'
-        .on 'click', quoteReply
+        toggleUpdate yes if config.AUTO_UPDATE
 
     dom '.js-reply'
         .each formatReply, () ->

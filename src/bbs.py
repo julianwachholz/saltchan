@@ -160,4 +160,4 @@ def filename(r, board_id, uploaded_name):
     """
     ext = uploaded_name.split('.')[-1]
     fileid = r.incr(KEY_UPLOADS % {'board': board_id})
-    return '{}.{}'.format(fileid, ext)
+    return '{}/{}.{}'.format(board_id, fileid, ext)

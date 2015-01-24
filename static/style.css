@@ -63,7 +63,7 @@ q {
   quotes: none;
   color: #789922;
 }
-.encrypted .reply-text {
+.encrypted .reply-text, .encrypted .reply-file {
   display: none;
 }
 .info {
@@ -75,10 +75,25 @@ q {
   color: #222;
 }
 .reply-file {
-  width: 250px;
-  max-width: 100%;
+  max-width: 250px;
   float: left;
   margin: .25em 1em 1em 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.reply-file.expand {
+  max-width: 100%;
+  max-height: 100%;
+  margin: .25em 0 1em;
+  float: none;
+}
+.reply-file img {
+  margin-top: .1em;
+  max-width: 100%;
+  max-height: 250px;
+}
+.reply-file.expand img {
+  max-height: 100%;
 }
 .reply-text {
   white-space: pre-line;
@@ -99,17 +114,30 @@ q {
   font-family: monospace;
   opacity: 0.6;
 }
+.file-tools:hover .badge,
 .badge:hover {
   opacity: 1;
 }
 .badge.text-white {
   color: #fff;
 }
-.small, .meta, .badge {
+.small, .meta, .badge, figcaption {
   font-size: 0.7em;
 }
-.meta, .meta a {
+.meta, .meta a, figcaption {
   color: #888;
+}
+.file-tools a:link {
+  color: inherit;
+}
+.file-tools a:link:hover {
+  color: #00c;
+}
+.file-tools .js-file-decrypt {
+  display: none;
+}
+.file-tools.show-decrypt .js-file-decrypt {
+  display: inline;
 }
 a.clear {
   color: inherit;

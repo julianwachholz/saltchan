@@ -42,6 +42,15 @@ MAX_REPLIES = 250
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 
+# file uploads
+MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5 MB
+MIME_READ = 128  # How many bytes to read from a file to guess its MIME
+ALLOWED_MIME = [
+    'image/jpeg',
+    'image/gif',
+    'image/png',
+]
+
 
 # ----
 # Application settings

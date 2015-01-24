@@ -74,9 +74,13 @@ module.exports.getSignPublicKey = (reply) ->
 #
 module.exports.verifySignature = (text, signature, publicKey) ->
     decodedText = nacl.util.decodeUTF8 text
+    if typeof signature == 'string'
+        signature = verifyAndDecodeBase64 nacl.sign.signatureLength, signature
+    if typeof publicKey == 'string'
+        publicKey = verifyAndDecodeBase64 nacl.sign.publicKeyLength, publicKey
     try
         nacl.sign.detached.verify decodedText, signature, publicKey
-    catch
+    catch e
         false
 
 
@@ -84,6 +88,9 @@ module.exports.verifySignature = (text, signature, publicKey) ->
 # get a colored badge for a publicKey
 #
 module.exports.getBadge = (publicKey) ->
+    if typeof publicKey == 'string'
+        publicKey = verifyAndDecodeBase64 nacl.sign.publicKeyLength, publicKey
+
     keyLength = publicKey.length
     colorOffset = Math.floor publicKey[0] / 255 * keyLength
     color = [
@@ -103,6 +110,15 @@ module.exports.getBadge = (publicKey) ->
 
 
 ##
+# returns the signature of text data
+#
+module.exports.sign = signDetached = (text) ->
+    if not threadKeys
+        generateNewKeys THREAD_NEW
+    nacl.util.encodeBase64 nacl.sign.detached nacl.util.decodeUTF8(text), threadKeys.sign.secretKey
+
+
+##
 # returns an object with text, signature and publickeys
 #
 module.exports.signReply = (text) ->
@@ -112,27 +128,59 @@ module.exports.signReply = (text) ->
     text: text
     pubkey: nacl.util.encodeBase64 threadKeys.box.publicKey
     pubsign: nacl.util.encodeBase64 threadKeys.sign.publicKey
-    signature: nacl.util.encodeBase64 nacl.sign.detached nacl.util.decodeUTF8(text), threadKeys.sign.secretKey
+    signature: signDetached text
+
+
+##
+# generate a random secret
+#
+module.exports.randomKey = -> nacl.randomBytes nacl.secretbox.keyLength
+
+
+##
+# symmetric encryption
+#
+module.exports.secretbox = (data, nonce, secret) ->
+    if typeof data == 'string'
+        data = nacl.util.decodeUTF8 data
+    if typeof nonce == 'string'
+        nonce = verifyAndDecodeBase64 nacl.secretbox.nonceLength, nonce
+    if typeof secret == 'string'
+        secret = verifyAndDecodeBase64 nacl.secretbox.keyLength, secret
+    nacl.secretbox data, nonce, secret
+
+##
+# symmetric decryption
+#
+module.exports.secretboxOpen = (data, nonce, secret) ->
+    if typeof nonce == 'string'
+        nonce = verifyAndDecodeBase64 nacl.secretbox.nonceLength, nonce
+    if typeof secret == 'string'
+        secret = verifyAndDecodeBase64 nacl.secretbox.keyLength, secret
+    nacl.secretbox.open data, nonce, secret
 
 
 ##
 # encrypt a reply for all recipients
 #
-module.exports.encryptReply = (recipientKeys, text, signature) ->
-    data = []
-    payload = nacl.util.decodeUTF8 JSON.stringify text: text, signature: signature
+module.exports.encryptReply = (recipientKeys, secret, payload) ->
+    nonce = nacl.randomBytes nacl.secretbox.nonceLength
+    data =
+        recipients: []
+        nonce: nacl.util.encodeBase64 nonce
+        payload: nacl.util.encodeBase64 nacl.secretbox nacl.util.decodeUTF8(payload), nonce, secret
 
     for recipientKey in recipientKeys
         decodedKey = verifyAndDecodeBase64 nacl.box.publicKeyLength, recipientKey
         continue if not decodedKey
 
-        nonce = nacl.randomBytes nacl.secretbox.nonceLength
-        data.push
+        recipientNonce = nacl.randomBytes nacl.secretbox.nonceLength
+        data.recipients.push
             key: recipientKey
-            nonce: nacl.util.encodeBase64 nonce
-            data: nacl.util.encodeBase64 nacl.box payload, nonce, decodedKey, threadKeys.box.secretKey
+            nonce: nacl.util.encodeBase64 recipientNonce
+            secret: nacl.util.encodeBase64 nacl.box secret, recipientNonce, decodedKey, threadKeys.box.secretKey
 
-    return JSON.stringify data
+    return data
 
 
 ##
@@ -142,18 +190,25 @@ module.exports.decryptReply = (reply) ->
     theirPublicKey = verifyAndDecodeBase64 nacl.box.publicKeyLength, reply.getAttribute 'data-pubkey'
     myPublicKeyBase64 = nacl.util.encodeBase64 threadKeys.box.publicKey
 
-    for data in JSON.parse dom.htmlDecode dom('.reply-text', reply).value()
-        continue unless data.key == myPublicKeyBase64
-        payload = nacl.box.open(
-            nacl.util.decodeBase64 data.data
-            verifyAndDecodeBase64(nacl.secretbox.nonceLength, data.nonce)
+    data = JSON.parse dom.htmlDecode dom('.reply-text', reply).value()
+    for recipient in data.recipients
+        continue unless recipient.key == myPublicKeyBase64
+        secret = nacl.box.open(
+            nacl.util.decodeBase64 recipient.secret
+            verifyAndDecodeBase64(nacl.secretbox.nonceLength, recipient.nonce)
             theirPublicKey
             threadKeys.box.secretKey
         )
-        if not payload
+        if not secret
             throw new Error "Failed decrypting reply!"
         try
-            return JSON.parse nacl.util.encodeUTF8 payload
-        catch e
-            throw new Error "Failed encoding decrypted reply!"
+            reply.setAttribute 'data-nonce', data.nonce
+            reply.setAttribute 'data-secret', nacl.util.encodeBase64 secret
+            return JSON.parse nacl.util.encodeUTF8 nacl.secretbox.open(
+                nacl.util.decodeBase64 data.payload
+                verifyAndDecodeBase64(nacl.secretbox.nonceLength, data.nonce)
+                secret
+            )
+        catch
+            throw new Error "Failed opening secret box!"
     throw new Error "Not encrypted for you!"
