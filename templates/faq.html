@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block meta %}{# Hide contents until script is ready. #}
+<meta name="description" content="Frequently asked questions about time travel and saltchan.">
+{% endblock %}
+
+{% block content %}
+
+  <p>saltchan FAQ</p>
+
+  <dl>
+    <dt>How does this work?</dt>
+    <dd>
+      <p>For every thread you visit or create, we'll generate a unique keypair on
+      the fly that we use to sign and optionally encrypt your submission. This
+      is powered by a <a href="https://dchest.github.io/tweetnacl-js/">JavaScript port</a>
+      of <a href="http://tweetnacl.cr.yp.to/">tweetnacl</a>.</p>
+    </dd>
+
+    <dt>Is this secure?</dt>
+    <dd>
+      <p>Maybe. We can never be certain. Not unless a third party has conducted a
+      thorough review of the <a href="https://github.com/julianwachholz/saltchan">underlying codebase</a>.</p>
+      <p>Feel free to browse the <a href="https://github.com/julianwachholz/saltchan">source</a>
+      and assure yourself that the server truly does not know anything about an encrypted
+      submission.</p>
+    </dd>
+
+    <dt>Any caveats?</dt>
+    <dd>
+      <p>For now, submitting an encrypted image <strong>will not</strong> encrypt the
+      filename, which will stay publicly visible.</p>
+      <p>If you'd like to encrypt an animated GIF, only the first frame will be used.</p>
+    </dd>
+
+    <dt>Further questions</dt>
+    <dd>
+      <p>Feel free to ask any other questions in <a href="/a/">/a/</a>.</p>
+    </dd>
+  </dl>
+
+{% endblock %}

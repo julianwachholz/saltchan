@@ -42,6 +42,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/faq/')
+def faq():
+    return render_template('faq.html')
+
+
 @app.errorhandler(400)
 @app.errorhandler(404)
 @app.errorhandler(410)

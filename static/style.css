@@ -16,6 +16,10 @@ input[type="text"], textarea {
   max-width: 400px;
   font: normal .8em/1.4 sans-serif;
 }
+p {
+  max-width: 600px;
+  width: 90%;
+}
 label.check {
   display: inline-block;
   padding-left: 15px;
