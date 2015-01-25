@@ -63,7 +63,7 @@ formSubmit = (event) ->
                 return
     else
         data.value = JSON.stringify json
-        ajaxReply
+        ajaxReply()
     return
 
 
@@ -84,11 +84,11 @@ ajaxReply = (file, filename) ->
         if input.name
             data.append input.name, input.value
 
-    if file.size > MAX_UPLOAD
-        formError "File is too large!"
-        return
-
-    data.append 'file', file, filename if file
+    if file
+        if file.size > MAX_UPLOAD
+            formError "File is too large!"
+            return
+        data.append 'file', file, filename
 
     qwest.post window.location.pathname, data
     .then (json) ->
