@@ -1,4 +1,5 @@
 import json
+import hashlib
 import dateutil.parser
 from datetime import datetime
 import config
@@ -30,7 +31,7 @@ def new_thread(r, request, board_id, subject, data):
     })
     pipe.hmset(KEY_BUMP % {'board': board_id, 'thread': thread}, {
         'time': now.strftime('%s'),
-        'ip': request.remote_addr,
+        'ip': hashlib.sha1(request.remote_addr.encode()).hexdigest(),
         'bump': 1,
     })
     pipe.incr(KEY_REPLY_COUNT % {'board': board_id, 'thread': thread})
@@ -139,11 +140,13 @@ def new_reply(r, request, board_id, thread_id, data):
 
     bump_key = KEY_BUMP % {'board': board_id, 'thread': thread_id}
     last_bump = r.hgetall(bump_key)
-    if int(last_bump.get(b'bump', 0)) < config.BOARDS[board_id]['bump_limit'] and \
-       last_bump[b'ip'].decode('utf-8') != request.remote_addr:
+
+    last_bump_ip = last_bump[b'ip'].decode('utf-8')
+    remote_ip = hashlib.sha1(request.remote_addr.encode()).hexdigest()
+    if last_bump_ip != remote_ip and int(last_bump.get(b'bump', 0)) < config.BOARDS[board_id]['bump_limit']:
         pipe.hmset(bump_key, {
             'time': now.strftime('%s'),
-            'ip': request.remote_addr,
+            'ip': remote_ip,
             'bump': int(last_bump.get(b'bump')) + 1,
         })
 
