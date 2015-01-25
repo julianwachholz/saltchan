@@ -1,6 +1,6 @@
 # saltchan
 
-An easy to use almost-anonymous BBS with piece of cake publickey encryption.
+An easy to use almost-anonymous (pseudonymous) BBS with piece of cake publickey encryption.
 
 ## Installation
 
