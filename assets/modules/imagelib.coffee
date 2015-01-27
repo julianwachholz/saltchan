@@ -40,9 +40,6 @@ bytes2int = (bytes) ->
             x = x * 0x100
     x
 
-window.b2i = bytes2int
-window.i2b = int2bytes
-
 
 ##
 # remove alpha channel bits from an Uint8ClampedArray
@@ -59,6 +56,7 @@ removeAlpha = (arr, askAlpha) ->
             if askAlpha and byte < 255 and not alphaConfirm
                 alphaConfirm = confirm "We detected transparent pixels in this image. They will appear as black due to browser limitations. Continue?"
                 if not alphaConfirm
+                    ga 'send', 'nacl-image', 'alpha-cancel'
                     throw new Error "User canceled encryption."
             continue
         newArr.push byte
@@ -159,6 +157,7 @@ window.verifyImage = (e) ->
             e.appendChild nacl.getBadge pubSign
             e.parentNode.classList.add 'show-decrypt'
         else
+            ga 'send', 'nacl-image', 'verify-failed'
             alert "Image has been tampered with!"
             e.onclick = -> verifyImage(this)
         return
@@ -200,11 +199,13 @@ window.decryptImage = (e) ->
     secret = reply.getAttribute 'data-secret'
     if not nonce or not secret
         alert "Can't decrypt this!"
+        ga 'send', 'nacl-image', 'decrypt-attempt'
         return
     setTimeout ->
         try
             image.src = decryptCanvas image, nonce, secret
         catch
+            ga 'send', 'nacl-image', 'decrypt-failed'
             alert "Failed decrypting image!"
         finally
             e.parentNode.removeChild(e)

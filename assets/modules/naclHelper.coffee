@@ -81,6 +81,7 @@ module.exports.verifySignature = (text, signature, publicKey) ->
     try
         nacl.sign.detached.verify decodedText, signature, publicKey
     catch e
+        ga 'send', 'nacl-errors', 'verify-failed', {nonInteraction: 1}
         false
 
 
@@ -200,6 +201,7 @@ module.exports.decryptReply = (reply) ->
             threadKeys.box.secretKey
         )
         if not secret
+            ga 'send', 'nacl-errors', 'decrypt-attempt', {nonInteraction: 1}
             throw new Error "Failed decrypting reply!"
         try
             reply.setAttribute 'data-nonce', data.nonce
@@ -210,5 +212,6 @@ module.exports.decryptReply = (reply) ->
                 secret
             )
         catch
+            ga 'send', 'nacl-errors', 'decrypt-failed', {nonInteraction: 1}
             throw new Error "Failed opening secret box!"
     throw new Error "Not encrypted for you!"

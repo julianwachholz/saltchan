@@ -59,10 +59,14 @@ formSubmit = (event) ->
                     file = imagelib.base64ToBlob base64
                 else file = fileInput.files[0]
                 data.value = JSON.stringify json
+                ga 'send', (if isThread then 'thread' else 'reply'), 'image'
+                ga 'send', 'reply', 'image-encrypted' if encrypted
                 ajaxReply file, imagelib.filename(file.type, fileInput.files[0].name)
                 return
     else
         data.value = JSON.stringify json
+        ga 'send', (if isThread then 'thread' else 'reply'), 'text'
+        ga 'send', 'reply', 'text-encrypted' if encrypted
         ajaxReply()
     return
 
@@ -125,6 +129,7 @@ getQuotedPublicKeys = (myPublicKey, text) ->
 
     if recipients.length < 2
         throw new Error unless dom('#meta-debug')
+    ga 'send', 'reply', 'recipients', recipients.length
     recipients
 
 
@@ -148,6 +153,7 @@ window.quote = (id) ->
     text = dom '#form-text'
     text.value += ">>#{id}\n"
     text.focus() if not config.QUOTE_NOFOCUS
+    ga 'send', 'click', 'quote', id
     return
 
 
@@ -156,6 +162,7 @@ window.quote = (id) ->
 #
 makeUpdateFunction = ->
     updateLinks = dom '.js-update'
+    threadId = parseInt dom('#meta-thread').getAttribute 'value'
     replyCount = parseInt dom('#meta-start').getAttribute 'value'
     replyList = dom '#js-reply-list'
     threadReplies = dom '.js-thread-replies'
@@ -169,6 +176,7 @@ makeUpdateFunction = ->
         updateLinks.each (link) ->
             link.innerHTML = 'Loading...'
             link.href = 'javascript:false'
+        ga 'send', 'click', 'update', threadId if not fn
 
         qwest.get  window.location.pathname + "?start=#{replyCount}"
         .then (data) ->
@@ -197,6 +205,7 @@ makeToggleUpdateFunction = ->
     timer = null
 
     toggles.on 'click', () ->
+        ga 'send', 'click', 'autoupdate'
         currentTimeout = 10
         toggleUpdate @checked
 

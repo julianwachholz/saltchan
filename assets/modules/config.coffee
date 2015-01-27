@@ -32,6 +32,7 @@ window.settings = ->
     if not settings
         settings = createSettings()
     settings.classList.toggle('visible')
+    ga 'send', 'click', 'settings'
     return
 
 
