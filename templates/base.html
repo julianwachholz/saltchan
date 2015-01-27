@@ -54,7 +54,7 @@
 <a id="bottom" tabindex="-1"></a>
 
 <script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;</script>
-{% if not DEBUG and  -%}
+{% if not DEBUG and GA_ID -%}
 <script async defer src="//www.google-analytics.com/analytics.js"></script>
 <script>
   ga('create', '{{ GA_ID }}', 'auto');
