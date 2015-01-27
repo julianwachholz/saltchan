@@ -73,6 +73,7 @@ module.exports.getSignPublicKey = (reply) ->
 # verify a signed reply
 #
 module.exports.verifySignature = (text, signature, publicKey) ->
+    return false if signature is false
     decodedText = nacl.util.decodeUTF8 text
     if typeof signature == 'string'
         signature = verifyAndDecodeBase64 nacl.sign.signatureLength, signature

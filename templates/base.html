@@ -14,7 +14,7 @@
   {% if DEBUG -%}
   <script src="/static/app.js" async defer></script>
   {% else -%}
-  <script src="/static/app.min.js?v0" async defer></script>
+  <script src="/static/app.min.js?v1" async defer></script>
   {%- endif %}
   {%- endblock %}
 </head>
@@ -53,11 +53,11 @@
 </footer>
 <a id="bottom" tabindex="-1"></a>
 
-{% if not DEBUG and GA_ID -%}
+<script>window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;</script>
+{% if not DEBUG and  -%}
 <script async defer src="//www.google-analytics.com/analytics.js"></script>
 <script>
-  window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-  ga('create', 'UA-58618100-1', 'auto');
+  ga('create', '{{ GA_ID }}', 'auto');
   ga('set', 'anonymizeIp', true);
   ga('send', 'pageview', {useBeacon: true});
 </script>

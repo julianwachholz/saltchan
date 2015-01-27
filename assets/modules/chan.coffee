@@ -60,13 +60,13 @@ formSubmit = (event) ->
                 else file = fileInput.files[0]
                 data.value = JSON.stringify json
                 ga 'send', (if isThread then 'thread' else 'reply'), 'image'
-                ga 'send', 'reply', 'image-encrypted' if encrypted
+                ga 'send', 'reply', 'image-encrypted' if encrypt
                 ajaxReply file, imagelib.filename(file.type, fileInput.files[0].name)
                 return
     else
         data.value = JSON.stringify json
         ga 'send', (if isThread then 'thread' else 'reply'), 'text'
-        ga 'send', 'reply', 'text-encrypted' if encrypted
+        ga 'send', 'reply', 'text-encrypted' if encrypt
         ajaxReply()
     return
 
