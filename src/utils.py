@@ -78,9 +78,9 @@ def validate_post(request, board, r=None, with_subject=False):
         if not board['allow_uploads']:
             abort(400, 'Uploads not allowed here.')
 
-        import magic
         file = request.files['file']
-        verify_file(file)
+        if not data['signature'] == 'ENCRYPTED':
+            verify_file(file)
         uploaded_name = secure_filename(file.filename)
         filename = bbs.filename(r, board['id'], uploaded_name)
         file.save(os.path.join(config.UPLOAD_ROOT, filename))

@@ -32,11 +32,11 @@
           </a>
         </figcaption>
         <img src="/files/{{ reply.data.file_url }}" onclick="this.parentNode.classList.toggle('expand')"
-             data-signature="{{ reply.data.file_signature }}">
+             data-mime="{{ reply.data.file_mime }}" data-signature="{{ reply.data.file_signature }}">
         <figcaption class="file-tools">
-          <a href="javascript:" onclick="verifyImage(this)">Verify</a>
+          <a href="javascript:" onclick="verify(this)">Verify</a>
           {% if reply.data.signature == 'ENCRYPTED' %}
-            <a href="javascript:" onclick="decryptImage(this)" class="js-file-decrypt">Decrypt</a>
+            <a href="javascript:" onclick="decrypt(this)" class="js-file-decrypt">Decrypt</a>
           {% endif %}
         </figcaption>
       </figure>

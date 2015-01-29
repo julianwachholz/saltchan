@@ -72,15 +72,16 @@ module.exports.getSignPublicKey = (reply) ->
 ##
 # verify a signed reply
 #
-module.exports.verifySignature = (text, signature, publicKey) ->
+module.exports.verifySignature = (data, signature, publicKey) ->
     return false if signature is false
-    decodedText = nacl.util.decodeUTF8 text
+    if typeof data == 'string'
+        data = nacl.util.decodeUTF8 data
     if typeof signature == 'string'
         signature = verifyAndDecodeBase64 nacl.sign.signatureLength, signature
     if typeof publicKey == 'string'
         publicKey = verifyAndDecodeBase64 nacl.sign.publicKeyLength, publicKey
     try
-        nacl.sign.detached.verify decodedText, signature, publicKey
+        nacl.sign.detached.verify data, signature, publicKey
     catch e
         ga 'send', 'nacl-errors', 'verify-failed', {nonInteraction: 1}
         false
@@ -112,12 +113,25 @@ module.exports.getBadge = (publicKey) ->
 
 
 ##
-# returns the signature of text data
+# Hash some content, probably a file attachment
 #
-module.exports.sign = signDetached = (text) ->
+module.exports.hash = (data) ->
     if not threadKeys
         generateNewKeys THREAD_NEW
-    nacl.util.encodeBase64 nacl.sign.detached nacl.util.decodeUTF8(text), threadKeys.sign.secretKey
+    if typeof data == 'string'
+        data = nacl.util.decodeUTF8 data
+    nacl.hash data
+
+
+##
+# returns the signature of text data
+#
+module.exports.sign = signDetached = (data) ->
+    if not threadKeys
+        generateNewKeys THREAD_NEW
+    if typeof data == 'string'
+        data = nacl.util.decodeUTF8 data
+    nacl.util.encodeBase64 nacl.sign.detached data, threadKeys.sign.secretKey
 
 
 ##

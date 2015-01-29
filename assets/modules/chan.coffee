@@ -3,12 +3,13 @@
 
 dom = require './dom'
 nacl = require './naclHelper'
-imagelib = require './imagelib'
+filelib = require './filelib'
 config = require './config'
 qwest = require '../bower_components/qwest'
 
-MAX_UPLOAD = 5 * 1024 * 1024
+MAX_UPLOAD = 5 * 1024 * 1024  # max upload size in bytes
 
+# state!
 isThread = no
 autoUpdateEnabled = no
 toggleUpdate = null
@@ -28,46 +29,49 @@ formSubmit = (event) ->
     text = dom('#form-text').value.cleanWhitespace()
     data = dom '#form-data'
     json = nacl.signReply text
-    randomKey = null
-    encrypt = no
+    secret = null
+    encrypt = dom('#form-encrypt')?.checked
 
     currentForm = @
 
-    if dom('#form-encrypt')?.checked
+    if encrypt
         try
             recipientKeys = getQuotedPublicKeys json.pubkey, text
         catch
-            formError 'No recipients for encrypted reply.'
+            formError 'Please quote at least 1 recipient for your message.'
             return
-        encrypt = yes
-        randomKey = nacl.randomKey()
+        secret = nacl.randomKey()  # used for symmetric encryption
         payload = JSON.stringify text: json.text, signature: json.signature
-        encryptObj = nacl.encryptReply recipientKeys, randomKey, payload
+        encryptObj = nacl.encryptReply recipientKeys, secret, payload
         json.text = JSON.stringify encryptObj
         json.signature = 'ENCRYPTED'
 
     fileInput = dom('#form-file')
     if fileInput?.files.length > 0
-        imagelib.getImageData
-            file: fileInput.files[0]
-            encrypt: encrypt
-            nonce: encryptObj?.nonce
-            secret: randomKey
-            callback: (base64) ->
-                json.file_signature = nacl.sign base64
+        file = fileInput.files[0]
+        filelib.getData
+            file: file
+            error: (error) ->
+                formError error
+            success: (mime, filedata) ->
+                filename = filelib.filename(file.type, file.name)
+                json.file_mime = mime
+                json.file_signature = nacl.sign nacl.hash filedata
+
                 if encrypt
-                    file = imagelib.base64ToBlob base64
-                else file = fileInput.files[0]
+                    file = new File [new Uint8Array nacl.secretbox filedata, encryptObj.nonce, secret],
+                                    filename, type: mime
                 data.value = JSON.stringify json
+
                 ga 'send', (if isThread then 'thread' else 'reply'), 'image'
                 ga 'send', 'reply', 'image-encrypted' if encrypt
-                ajaxReply file, imagelib.filename(file.type, fileInput.files[0].name)
+                ajaxReply file
                 return
     else
         data.value = JSON.stringify json
         ga 'send', (if isThread then 'thread' else 'reply'), 'text'
         ga 'send', 'reply', 'text-encrypted' if encrypt
-        ajaxReply()
+        ajaxReply null
     return
 
 
@@ -82,7 +86,7 @@ formError = (error) ->
 window.formError = formError
 
 
-ajaxReply = (file, filename) ->
+ajaxReply = (file) ->
     data = new FormData
     for input in currentForm
         if input.name
@@ -90,9 +94,9 @@ ajaxReply = (file, filename) ->
 
     if file
         if file.size > MAX_UPLOAD
-            formError "File is too large!"
+            formError "File too large: 5MB max."
             return
-        data.append 'file', file, filename
+        data.append 'file', file, file.name
 
     qwest.post window.location.pathname, data
     .then (json) ->
@@ -269,8 +273,8 @@ makeReplyNode = (reply) ->
           <img src="/files/#{reply.data.file_url}" onclick="this.parentNode.classList.toggle('expand')"
                data-signature="#{reply.data.file_signature}">
           <figcaption class="file-tools">
-            <a href="javascript:" onclick="verifyImage(this)">Verify</a>
-            #{if reply.data.signature == 'ENCRYPTED' then '<a href="javascript:" onclick="decryptImage(this)" class="js-file-decrypt">Decrypt</a>' else ''}
+            <a href="javascript:" onclick="verify(this)">Verify</a>
+            #{if reply.data.signature == 'ENCRYPTED' then '<a href="javascript:" onclick="decrypt(this)" class="js-file-decrypt">Decrypt</a>' else ''}
           </figcaption>
         </figure>
         """
@@ -330,5 +334,12 @@ module.exports.ready = ->
 
     dom '.js-form'
         .on 'submit', formSubmit
+    currentForm = dom('.js-form').get()
+
+    dom '#form-file'
+        .addEventListener 'change', (event) ->
+            if @files.length > 0 and @files[0].size > MAX_UPLOAD
+                formError "File too large: 5MB max."
+            return
 
     return
