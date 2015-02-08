@@ -3,7 +3,7 @@
 {% block title %}/{{ board.id }}/ - {{ board.title }}{% endblock %}
 
 {% block meta %}{# Hide contents until script is ready. #}
-<script>document.documentElement.className='not-ready'</script>
+<script>document.documentElement.className='not-ready2'</script>
 <style>.not-ready{visibility:hidden}</style>
 
 <meta name="description" content="/{{ board.id }}/ - {{ board.title }} - {{ board.description }}">
@@ -30,13 +30,6 @@
   {%- endif %}
 </p>
 
-<form method="post" class="js-form"{% if board.allow_uploads %} enctype="multipart/form-data"{% endif %}>
-  <h4>Sta<abbr>r</abbr>t new thread:</h4>
-  <div class="error-message"></div>
-  <input type="text" name="subject" accesskey="r" tabindex="0" placeholder="Subject" maxlength="{{ SUBJECT_MAXLEN }}"><br>
-  <textarea id="form-text" rows="6" cols="40" tabindex="0" placeholder="Comment" required></textarea><br>
-  <button id="form-submit" type="submit" accesskey="s" tabindex="0">New thread</button>
-  {% if board.allow_uploads %}<input type="file" id="form-file" accesskey="f" tabindex="0">{% endif %}
-  <input type="hidden" name="data" id="form-data">
-</form>
+{% include '_form.html' %}
+
 {% endblock %}

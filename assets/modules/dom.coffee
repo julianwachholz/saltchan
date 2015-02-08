@@ -1,10 +1,11 @@
-# extremely simple dom manipulation
+###
+Very, very simple DOM manipulation.
+###
 
 class dom
     constructor: (selector, parent) ->
         parent = document if not parent
         @elements = [].slice.call parent.querySelectorAll selector
-        return
 
     get: (index = 0) ->
         @elements[index]

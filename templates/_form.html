@@ -1,0 +1,21 @@
+<form method="post" id="form" data-mode="{% if isThread %}reply{% else %}thread{% endif %}">
+{% if isThread %}
+  <h4><abbr>R</abbr>eply:</h4>
+{% else %}
+  <h4>Sta<abbr>r</abbr>t new thread:</h4>
+{% endif %}
+  <div id="error" class="error-message"></div>
+{% if not isThread %}
+  <input id="subject" type="text" tabindex="0" placeholder="Subject" maxlength="{{ SUBJECT_MAXLEN }}"><br>
+{% endif %}
+  <textarea id="comment" rows="6" cols="40" accesskey="r" tabindex="0" placeholder="Comment"></textarea><br>
+  <button id="submit" type="submit" accesskey="s" tabindex="0">Po<abbr>s</abbr>t</button>
+{% if board.allow_uploads %}
+  <input id="file" type="file" tabindex="0" accept="image/*">
+{% endif %}
+{% if isThread %}
+  <label class="small check">
+    <input id="encrypt" type="checkbox" tabindex="0"> Encrypt to mentioned posters.
+  </label>
+{% endif %}
+</form>

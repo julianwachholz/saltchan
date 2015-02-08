@@ -1,4 +1,6 @@
-# simple config holder
+###
+User options dialog.
+###
 
 dom = require './dom'
 

@@ -7,7 +7,7 @@ rel: deps
 	browserify --bare --no-bundle-external -t coffeeify --extension=".coffee" main.coffee \
 	| uglifyjs - --screw-ie8 --mangle --compress > $(DEST)/app.min.js
 
-dev: deps
+dev:
 	watchify -d -t coffeeify --extension=".coffee" -o $(DEST)/app.js main.coffee
 
 deps:

@@ -65,7 +65,7 @@ def validate_post(request, board, r=None, with_subject=False):
     except ValueError:
         abort(400, 'Invalid JSON received.')
 
-    if not data['text'].strip():
+    if not data.get('comment', '').strip():
         abort(400, 'Empty message.')
 
     if with_subject:
@@ -79,7 +79,7 @@ def validate_post(request, board, r=None, with_subject=False):
             abort(400, 'Uploads not allowed here.')
 
         file = request.files['file']
-        if not data['signature'] == 'ENCRYPTED':
+        if not data.get('signature') == 'ENCRYPTED':
             verify_file(file)
         uploaded_name = secure_filename(file.filename)
         filename = bbs.filename(r, board['id'], uploaded_name)

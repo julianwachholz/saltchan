@@ -31,8 +31,9 @@
             {{ reply.data.file }}
           </a>
         </figcaption>
-        <img src="/files/{{ reply.data.file_url }}" onclick="this.parentNode.classList.toggle('expand')"
-             data-mime="{{ reply.data.file_mime }}" data-signature="{{ reply.data.file_signature }}">
+        <img {% if reply.data.signature == 'ENCRYPTED' %}data-{% endif %}src="/files/{{ reply.data.file_url }}"
+             data-mime="{{ reply.data.file_mime }}" data-signature="{{ reply.data.file_signature }}"
+             onclick="this.parentNode.classList.toggle('expand')">
         <figcaption class="file-tools">
           <a href="javascript:" onclick="verify(this)">Verify</a>
           {% if reply.data.signature == 'ENCRYPTED' %}
@@ -41,7 +42,7 @@
         </figcaption>
       </figure>
     {% endif %}
-    <p class="reply-text js-text">{{ reply.data.text }}</p>
+    <p class="reply-text js-text">{{ reply.data.comment }}</p>
 
     {% if reply.data.signature == 'ENCRYPTED' %}
       <p class="encrypted-info"><em class="meta">Encrypted message.</em></p>

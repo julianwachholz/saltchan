@@ -9,6 +9,7 @@
   {% block meta %}
   <meta name="description" content="saltchan is a pseudonymous messaging board with signed and encrypted messages.">
   {% endblock %}
+  {% if DEBUG %}<meta id="meta-debug" value="true">{% endif %}
   <link rel="stylesheet" href="/static/style.css">
   {% block js -%}
   {% if DEBUG -%}
